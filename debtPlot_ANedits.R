@@ -154,7 +154,7 @@ debtPlot <- function(data) {
         prefix = "$",
         scale = (1e-6),
         largest_with_cents = 1
-      ), limits = c(y_minimum, y_maximum*1.2),
+      ), limits = c(y_minimum, y_maximum*1.4),
       # defines the right side y-axis as a transformation of the left side axis, maximum UAAL = 100%, sets the breaks, labels
       sec.axis = ggplot2::sec_axis(
         ~ . / (y_maximum / 100),
@@ -168,7 +168,7 @@ debtPlot <- function(data) {
       # removes the extra space so the fill is at the origin
       expand = c(0, 0)
       )+
-    coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+    ##Added limits
+    coord_cartesian(ylim=(c(y_minimum, y_maximum*1.4)))+    ##Added limits
     # sets the x-axis scale
     ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
                                 expand = c(0, 0)) +#Added blanck ticks to x-axis
