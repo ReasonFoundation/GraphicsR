@@ -130,7 +130,7 @@ debtPlot <- function(data) {
   
   ggplot2::ggplot(graph,
                   ggplot2::aes(x = graph$year)) +
-    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign)) +#Removed "color" paramater
+    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign, color = graph$sign)) +#Removed "color" paramater
     ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * (y_maximum)),
                        color = palette_reason$GreyBlue,#Referenced Color Palette
                        size = 1.7) +#Increased Size 1.
