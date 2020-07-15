@@ -75,7 +75,6 @@ filteredData <- function(data, plan, fy){
       benefit_payments = benefit_payments_dollar,
       refunds = refunds_dollar,#added
       admin_exp = administrative_expense_dollar,
-      cost_structure,
       payroll = covered_payroll_dollar,
       ee_contribution = employee_contribution_dollar,
       ee_nc_pct = employee_normal_cost_percentage,
