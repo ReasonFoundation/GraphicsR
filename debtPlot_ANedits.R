@@ -124,7 +124,6 @@ debtPlot <- function(data) {
     dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 0 ~ "positive",
                                           .data$uaal < 0 ~ "negative"))
   
-  
   y_minimum <- min(graph$uaal)
   y_maximum <- max(graph$uaal)
   
@@ -144,7 +143,6 @@ debtPlot <- function(data) {
                  "positive" = paste(palette_reason$Red)),#Referenced Color Palette
       aesthetics = c("colour", "fill")
     ) +
-    
     # sets the y-axis scale
     ggplot2::scale_y_continuous(
       # creates 10 break points for labels
