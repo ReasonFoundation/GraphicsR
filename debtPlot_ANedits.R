@@ -1,6 +1,5 @@
 ##Updated debtPlot*(version ANedits)
 
-#Swaroop
 ##############
 library(pensionviewr)
 library(reasontheme)
@@ -29,8 +28,6 @@ palette_reason <- data.frame(
 #ColorName  
 
 ###
-#set reasontheme
-set_reason_theme(style = "slide")
 ##Pull PERSI data
 ##Load list of plans
 pl <- planList()
@@ -107,8 +104,11 @@ PERSI.debt$year <- as.numeric(PERSI.debt$year)
 #Set to data.frame for visualization
 IPERS <- data.frame(PERSI.debt)
 ###########
+#set reasontheme
+set_reason_theme(style = "slide")
 
 ####Edit detPlot() manually
+############
 debtPlot <- function(data) {
   data <- data %>%
     dplyr::filter(data$uaal != 0)
@@ -126,10 +126,9 @@ debtPlot <- function(data) {
   
   y_minimum <- min(graph$uaal)
   y_maximum <- max(graph$uaal)
-  
   ggplot2::ggplot(graph,
                   ggplot2::aes(x = graph$year)) +
-    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign, color = graph$sign)) +#Removed "color" paramater
+    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign)) +#Removed "color" paramater
     ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * (y_maximum)),
                        color = palette_reason$GreyBlue,#Referenced Color Palette
                        size = 1.7) +#Increased Size 1.
@@ -151,8 +150,9 @@ debtPlot <- function(data) {
       labels = scales::dollar_format(
         prefix = "$",
         scale = (1e-6),
-        largest_with_cents = 1
-      ), limits = c(y_minimum, y_maximum*1.4),
+        largest_with_cents = 1,
+     ), 
+       limits = c(y_minimum, y_maximum*1.2),
       # defines the right side y-axis as a transformation of the left side axis, maximum UAAL = 100%, sets the breaks, labels
       sec.axis = ggplot2::sec_axis(
         ~ . / (y_maximum / 100),
@@ -166,13 +166,24 @@ debtPlot <- function(data) {
       # removes the extra space so the fill is at the origin
       expand = c(0, 0)
       )+
-    coord_cartesian(ylim=(c(y_minimum, y_maximum*1.4)))+    ##Added limits
+    #labs(title = paste(title))+
+    coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
     # sets the x-axis scale
     ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
                                 expand = c(0, 0)) +#Added blanck ticks to x-axis
     
     ggplot2::theme(legend.position = "none")
 }
-
+##Plot graph
 debtPlot(PERSI.debt)
+############
+
+#https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
+#save_plot <- function (plot_grid, width, height, save_filepath) {
+#  grid::grid.draw(plot_grid)
+#  #save it
+#  ggplot2::ggsave(filename = save_filepath,
+#                  plot=plot_grid, width=(width/72), height=(height/72),  bg="white")
+#}
+#save_plot(plot1, 600, 400, "/users/Anil/downlaods")
 ####
