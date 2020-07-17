@@ -1,17 +1,13 @@
 # R Reason Style Guide
 
-## Reason Theme/Graphics
-## author: "Anil Niraula"
-## date: "6/30/2020"
-##doc: R Markdown
+### Reason Theme/Graphics
+### author: "Anil Niraula"
+### date: "6/30/2020"
+### doc: R Markdown
 
 This is an R Markdown document that describes Reason graphics style in R.
 It should help unify visualization using gggplo()
 Packages: `pensionviewr`, `reasonTheme` & `ggplot2`
-
-# Defining:
-## Colors
-## ggplot() themes, labels, and margins, axis lines, scales, titles
 
 ```{r, out.length = "100px", out.width = "200px"}
 
@@ -30,6 +26,7 @@ palette_reason <- data.frame(
   SatBlue = "#3366CC", 
   Green = "#669900", 
   Red = "#CC0000")
+  
 ##Convert color code to RedGreenBlue palette (with rgb())
 #rgb1 <- col2rgb(colors$SatBlue, alpha = FALSE)/255
 #rownames(rgb1) <- c("red", "green", "blue")
@@ -45,21 +42,21 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 
 ## Standard Colors for graphics in R
 
-## Standardized Font: "Calibri"
-## Standardized graphics: ggpot() 
-## Standardized Theme: reasonTheme (
+### Standardized Font: "Calibri"
+### Standardized graphics: ggpot() 
+### Standardized Theme: reasonTheme (
       ##Main elements: line/rectangle/text
            line = ggplot2::element_line(
              rect = ggplot2::element_rect(
                text = ggplot2::element_text(
         
-      ##Plot elements: title/subtitle/caption/background/margin
+        Plot elements: title/subtitle/caption/background/margin
                  plot.title = ggplot2::element_text(
                     plot.subtitle = ggplot2::element_text(
                       plot.caption = ggplot2::element_text(
                         plot.background = 
                           plot.margin = 
-                    ###Adjustable: text(size, angle,face(bold), margin)
+                      #Adjustable: text(size, angle,face(bold), margin)
                     
 ## What you have to specify in ggplo(): 
  ##Data to graph
@@ -72,6 +69,3 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 ## Latest R Mountain of Debt Plot using using deptPlot() from `pensionviewr`
 ##Modified `deptPlot()` -> colors, remooved red line, edited year labels
   ![Latest Modified Debt Plot - PERSI](PERSI.debptPlot2.jpeg)
-
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
