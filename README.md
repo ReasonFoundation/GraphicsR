@@ -59,13 +59,13 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
                       #Adjustable: text(size, angle,face(bold), margin)
                     
 ## What you have to specify in ggplo(): 
- ##Data to graph
- ##Y-axis & X-axis scales
- ##Title
+ ### Data to graph
+ ### Y-axis & X-axis scales
+ ### Title
 
 ## Excel Mountain of Debt Plot for PERSI plan
   ![Original Debt Plot - PERSI](PERSI.Excel.graph.png)
 
 ## Latest R Mountain of Debt Plot using using deptPlot() from `pensionviewr`
-##Modified `deptPlot()` -> colors, remooved red line, edited year labels
+## Modified `deptPlot()` -> colors, removed red line, edited year labels, cut secondary Y-axis line
   ![Latest Modified Debt Plot - PERSI](PERSI.debptPlot2.jpeg)
