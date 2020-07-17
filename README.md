@@ -1,16 +1,17 @@
-## R Reason Style Gide
+## R Reason Style Guide
 
-#"Reason Theme/Graphics"
-#author: "Anil Niraula"
-#date: "6/30/2020"
-#R Markdown
+# Reason Theme/Graphics
+# author: "Anil Niraula"
+# date: "6/30/2020"
+# R Markdown
 
 This is an R Markdown document that describes Reason graphics style in R.
+It should help unify visualization using gggplo()
 Packages: `pensionviewr`, `reasonTheme` & `ggplot2`
 
-##Defining
-#Colors
-#ggplot() themes, labels, and margins
+## Defining:
+# Colors
+# ggplot() themes, labels, and margins, axis lines, scales, titles
 
 ```{r}
 
@@ -35,12 +36,16 @@ palette_reason <- data.frame(
 #rownames(rgb1) <- c("red", "green", "blue")
 #ColorName <- rgb(rgb1[1],rgb1[2],rgb1[3])
 #######
+```
+
+```{r}
 for (i in (1:8)){
 x <- plot(c(5, 10), c(15, 30), type= "n", main=c(colnames(palette_reason[i])), xlab = "", 
 ylab = c(as.character(palette_reason[1,i])), xaxt="n", yaxt="n",cex.lab=1.5, cex.main=2)
 rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transparent")
 }
 ```
+
 ## Standard Colors for graphics in R
 
 ## Standardized Font: "Calibri"
