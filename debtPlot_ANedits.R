@@ -8,9 +8,6 @@ library(tidyverse)
 
 !!HELLO WORLD!!!
 
-x <- (1, 3, 4)
-x
-
 ##Palette
 palette_reason <- data.frame(
   Orange = "#FF6633", 
@@ -114,7 +111,7 @@ set_reason_theme(style = "slide")
 
 ####Edit detPlot() manually
 ############
-debtPlot <- function(data) {
+debtPlot <- function(data, title) {
   data <- data %>%
     dplyr::filter(data$uaal != 0)
   # extrapolate between years linearly
@@ -171,7 +168,7 @@ debtPlot <- function(data) {
       # removes the extra space so the fill is at the origin
       expand = c(0, 0)
       )+
-    #labs(title = paste(title))+
+    labs(title = paste(title))+
     coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
     # sets the x-axis scale
     ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
@@ -180,7 +177,7 @@ debtPlot <- function(data) {
     ggplot2::theme(legend.position = "none")
 }
 ##Plot graph
-debtPlot(PERSI.debt)
+debtPlot(PERSI.debt, "PERI Debt Plot")
 ############
 
 #https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
