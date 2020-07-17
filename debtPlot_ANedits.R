@@ -8,6 +8,9 @@ library(tidyverse)
 
 !!HELLO WORLD!!!
 
+x <- (1, 3, 4)
+x
+
 ##Palette
 palette_reason <- data.frame(
   Orange = "#FF6633", 
