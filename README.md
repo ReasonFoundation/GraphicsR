@@ -63,7 +63,7 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
  ##Title
 
 ## Original Mountain of Debt Plot using deptPlot() from `pensionviewr`
-  ![Original Debt Plot - PERSI](DebtPlot.Orig.jpeg)
+  ![Original Debt Plot - PERSI](PERSI.Excel.graph.png)
 
 ##Latest Mountain of Debt Plot using deptPlot()
 ## Modified colors & year labels
