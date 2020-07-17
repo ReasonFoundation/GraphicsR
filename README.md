@@ -43,7 +43,6 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 ```
 ## Standard Colors for graphics in R
 
-
 ## Standardized Font: "Calibri"
 ## Standardized graphics: ggpot() 
 ## Standardized Theme: reasonTheme (
