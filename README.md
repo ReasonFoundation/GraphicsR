@@ -1,18 +1,6 @@
----
-title: "Reason Theme/Graphics"
-author: "Anil"
-date: "6/30/2020"
-output:
-  word_document: default
-  pdf_document: default
-  html_document:
-    df_print: paged
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+##"Reason Theme/Graphics"
+##author: "Anil Niraula"
+##date: "6/30/2020"
 ## R Markdown
 
 This is an R Markdown document that describes Reason graphics style in R.
