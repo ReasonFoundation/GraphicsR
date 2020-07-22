@@ -40,9 +40,14 @@ palette_reason <- data.frame(
   Green = "#669900", 
   Red = "#CC0000")
 ##Convert color code to RedGreenBlue palette (with rgb())
-#rgb1 <- col2rgb(palette_reason$SatBlue, alpha = FALSE)/255
-#rownames(rgb1) <- c("red", "green", "blue")
-#ColorName <- rgb(rgb1[1],rgb1[2],rgb1[3])
+rgb1 <- col2rgb(palette_reason$SatBlue, alpha = FALSE)/255
+rgb1
+rownames(rgb1) <- c("red", "green", "blue")
+ColorName <- rgb(rgb1[1],rgb1[2],rgb1[3])
+ColorName
+#Customize color code
+ColorName2 <- rgb(0.1,0.5,0.8)
+ColorName2
 #######
 for (i in (1:8)){
 x <- plot(c(5, 10), c(15, 30), type= "n", main=c(colnames(palette_reason[i])), xlab = "", 
