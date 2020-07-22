@@ -40,9 +40,14 @@ palette_reason <- data.frame(
   Green = "#669900", 
   Red = "#CC0000")
 ##Convert color code to RedGreenBlue palette (with rgb())
-#rgb1 <- col2rgb(colors$SatBlue, alpha = FALSE)/255
-#rownames(rgb1) <- c("red", "green", "blue")
-#ColorName <- rgb(rgb1[1],rgb1[2],rgb1[3])
+rgb1 <- col2rgb(palette_reason$SatBlue, alpha = FALSE)/255
+rgb1
+rownames(rgb1) <- c("red", "green", "blue")
+ColorName <- rgb(rgb1[1],rgb1[2],rgb1[3])
+ColorName
+#Customize color code
+ColorName2 <- rgb(0.1,0.5,0.8)
+ColorName2
 #######
 for (i in (1:8)){
 x <- plot(c(5, 10), c(15, 30), type= "n", main=c(colnames(palette_reason[i])), xlab = "", 
@@ -54,13 +59,22 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 
 ## Including Plots
 
-## Standardized Font: "Calibri"
-## Standardized graphics: ggpot() 
-## Standardized Theme: reasonTheme (
-      ##Main elements: line/rectangle/text
-           line = ggplot2::element_line(
-             rect = ggplot2::element_rect(
-               text = ggplot2::element_text(
+## Standardized:
+## Base R package: ggplot2
+ #Base Font: "Calibri"
+ #Base Font size: 14.0
+ #Base Line size: 0.5
+
+## Base Theme: reasonTheme (
+     #plot.title (size = base_size * 12 / 8.5, margin = ggplot2::margin(b = 10L))
+     #plot.margin (t = half_line,
+                                  r = base_line_size * 24,
+                                  b = half_line,
+                                  l = half_line)
+     #axis.title(face = "bold", size = base_size)
+     #axis.title.x(margin = ggplot2::margin(t = 8L))
+     #axis.title.y(angle = 90L,margin = ggplot2::margin(r = 4L))
+     #axis.ticks.length(4L, "pt")
         
       ##Plot elements: title/subtitle/caption/background/margin
                  plot.title = ggplot2::element_text(
@@ -70,18 +84,22 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
                           plot.margin = 
                     ###Adjustable: text(size, angle,face(bold), margin)
                     
-## What you have to specify in ggplo(): 
- ##Data to graph
+## What you have to specify in ggplot(), after setting Reason theme, when you graph somthing in R: 
+ ##Data to use for the graph
  ##Y-axis & X-axis scales
+ ##Y-axis & X-axis limits
+ ##Colors
  ##Title
-
-## Original Mountain of Debt Plot using deptPlot() from `pensionviewr`
-  ![Original Debt Plot - PERSI](graphs/DebtPlot.Orig.jpeg)
 
 ##Latest Mountain of Debt Plot using deptPlot()
 ## Modified colors & year labels
-  ![Latest Modified Debt Plot - PERSI](graphs/PERSI.debptPlot2.jpeg)
+  ![Latest Modified Debt Plot - PERSI](PERSI.debptPlot2.jpeg)
 
+
+## Original Mountain of Debt Plot using deptPlot() from `pensionviewr`
+  ![Original Debt Plot - PERSI](graphs/DebtPlot.Orig.jpeg)
+  
+  
 ```{r, echo=FALSE}
 ```
 
