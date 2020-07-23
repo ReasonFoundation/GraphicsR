@@ -31,16 +31,15 @@ Packages: `pensionviewr` & `reasonTheme`
 palette_reason <- data.frame(
   Orange = "#FF6633", 
   LightOrange = "#FF9164",
+  Yellow = "#FFCC33", 
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
-  DarkBlue = "#1696d2",
+  DarkBlue = "#2879CB",
   GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
   LightBlue = "#3399CC", 
   SatBlue = "#3366CC", 
   Green = "#669900", 
   Red = "#CC0000")
-
 
 ##Convert color code to RedGreenBlue palette (with rgb())
 rgb1 <- col2rgb(palette_reason$SatBlue, alpha = FALSE)/255
@@ -63,7 +62,12 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 
 # Standardized R parameters:
 
-### Base R package: ggplot2
+### Base R package: ggplot2 (main parts)
+- geometry (ex: line, bar, point, text)
+- scale (ex: x-axis, y-axis, color, shape)
+- mapping of data to scales (ex: car type maps to the x-axis)
+- theme (ex: title font, caption color)
+
 ### Base Font: "Calibri"
 ### Base Font size: 14.0
 ### Base Line size: 0.5
