@@ -30,11 +30,11 @@ Packages: `pensionviewr` & `reasonTheme`
 
 palette_reason <- data.frame(
   Orange = "#FF6633", 
+  Yellow = "#FFCC33", 
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
-  DarkBlue = "#1696d2",
+  DarkBlue = "#0066CC",
   GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
   LightBlue = "#3399CC", 
   SatBlue = "#3366CC", 
   Green = "#669900", 
