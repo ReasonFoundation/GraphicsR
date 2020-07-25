@@ -6,16 +6,17 @@ library(reasontheme)
 library(data.table)
 library(tidyverse)
 
-!!HELLO WORLD!!!
+reason_color_pal()
 
 ##Palette
 palette_reason <- data.frame(
   Orange = "#FF6633", 
+  LightOrange = "#FF9164",
+  Yellow = "#FFCC33", 
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
-  DarkBlue = "#1696d2",
+  DarkBlue = "#2879CB",
   GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
   LightBlue = "#3399CC", 
   SatBlue = "#3366CC", 
   Green = "#669900", 
@@ -111,7 +112,7 @@ set_reason_theme(style = "slide")
 
 ####Edit detPlot() manually
 ############
-debtPlot <- function(data, title) {
+debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE) {
   data <- data %>%
     dplyr::filter(data$uaal != 0)
   # extrapolate between years linearly
@@ -153,8 +154,8 @@ debtPlot <- function(data, title) {
         prefix = "$",
         scale = (1e-6),
         largest_with_cents = 1,
-     ), 
-       limits = c(y_minimum, y_maximum*1.2),
+      ), 
+      limits = c(y_minimum, y_maximum*1.2),
       # defines the right side y-axis as a transformation of the left side axis, maximum UAAL = 100%, sets the breaks, labels
       sec.axis = ggplot2::sec_axis(
         ~ . / (y_maximum / 100),
@@ -167,17 +168,29 @@ debtPlot <- function(data, title) {
       ),
       # removes the extra space so the fill is at the origin
       expand = c(0, 0)
-      )+
-    labs(title = paste(title))+
+    )+
+    geom_hline(yintercept=0, linetype="solid", color = "black", size = 0.5)+
+    #geom_vline(data=graph, mapping=aes(xintercept=graph$year), color="blue")+
+    #ggplot2::theme(axis.text.x = element_text(vjust = 10*(1+(abs(y_minimum)/y_maximum))))+
+    
+   ##Adding titles & caption
+    labs(title = paste(title), 
+         caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
+    )+
     coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
     # sets the x-axis scale
     ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
                                 expand = c(0, 0)) +#Added blanck ticks to x-axis
     
-    ggplot2::theme(legend.position = "none")
+    ggplot2::theme(legend.position = "none")+
+    ##Adding Gridlines
+    ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
+                                                                    paste(palette_reason$SpaceGrey),"white"),size = (1)))
 }
 ##Plot graph
-debtPlot(PERSI.debt, "PERI Debt Plot")
+debtPlot(PERSI.debt)
+#With Title, caption and grid
+debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE)
 ############
 
 #https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
