@@ -109,10 +109,14 @@ IPERS <- data.frame(PERSI.debt)
 ###########
 #set reasontheme
 set_reason_theme(style = "slide")
+tick <- c("axis.ticks = ggplot2::element_blank(),
+          axis.ticks.x = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank()")
 
 ####Edit detPlot() manually
 ############
-debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE) {
+debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE) {
+  
   data <- data %>%
     dplyr::filter(data$uaal != 0)
   # extrapolate between years linearly
@@ -177,7 +181,11 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE) {
     labs(title = paste(title), 
          caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
     )+
-    coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
+    ggplot2::theme(axis.ticks = if(isFALSE(ticks)){ggplot2::element_blank()}else{ggplot2::element_line()}
+                   )+
+   # coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
+    coord_cartesian(expand = FALSE, #turn off axis expansion (padding)
+                    xlim = c(2001, 2019), ylim = c(y_minimum, y_maximum*1.2))+ #manually set limits
     # sets the x-axis scale
     ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
                                 expand = c(0, 0)) +#Added blanck ticks to x-axis
@@ -185,12 +193,12 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE) {
     ggplot2::theme(legend.position = "none")+
     ##Adding Gridlines
     ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
-                                                                    paste(palette_reason$SpaceGrey),"white"),size = (1)))
+                           paste(palette_reason$SpaceGrey),"white"),size = (1)))
 }
 ##Plot graph
 debtPlot(PERSI.debt)
 #With Title, caption and grid
-debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE)
+debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE, ticks = TRUE)
 ############
 
 #https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
