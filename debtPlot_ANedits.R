@@ -198,7 +198,9 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
 ##Plot graph
 debtPlot(PERSI.debt)
 #With Title, caption and grid
-debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE, ticks = TRUE)
+#debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE, ticks = TRUE)
+#debtPlot(PERSI.debt, caption = F, grid = F, ticks = T)
+
 ############
 
 #https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
