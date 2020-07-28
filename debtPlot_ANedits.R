@@ -9,9 +9,10 @@ library(tidyverse)
 reason_color_pal()
 
 ##Palette
+#https://www.rapidtables.com/web/color/Web_Safe.html
 palette_reason <- data.table(
   Orange = "#FF6633", 
-  LightOrange = "#FF9164",
+  LightOrange = "#FF9933",
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
   DarkBlue = "#0066CC",

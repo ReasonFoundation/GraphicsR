@@ -27,10 +27,11 @@ Packages: `pensionviewr` & `reasonTheme`
 # All images should use web safe colors — this gives us a range of orange and blue
 # colors that fit with Reason’s branding, as well as reds and greens that we can use to
 # indicate positive or negative data patterns. The following colors are most suitable:
+#https://www.rapidtables.com/web/color/Web_Safe.html
 
 palette_reason <- data.frame(
   Orange = "#FF6633", 
-  LightOrange = "#FF9164",
+  LightOrange = "#FF9933",
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
   DarkBlue = "#0066CC",
