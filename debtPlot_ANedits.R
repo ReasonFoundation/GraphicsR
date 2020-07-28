@@ -9,18 +9,20 @@ library(tidyverse)
 reason_color_pal()
 
 ##Palette
-palette_reason <- data.frame(
+palette_reason <- data.table(
   Orange = "#FF6633", 
   LightOrange = "#FF9164",
-  Yellow = "#FFCC33", 
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
-  DarkBlue = "#2879CB",
+  DarkBlue = "#0066CC",
   GreyBlue = "#6699CC", 
-  LightBlue = "#3399CC", 
+  Yellow = "#FFCC33", 
+  LightBlue = "#66B2FF", 
   SatBlue = "#3366CC", 
-  Green = "#669900", 
-  Red = "#CC0000")
+  Green = "#669900",
+  LightGreen = "#00CC66",
+  Red = "#CC0000",
+  LightRed = "#FF0000")
 #https://www.colorbook.io/hexcolors/view/A69FA1
 
 #rgb1 <- col2rgb(palette_reason$Yellow)/255
