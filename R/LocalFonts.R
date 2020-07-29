@@ -1,4 +1,4 @@
-#Get flist of onts installed
+#Get list of fonts installed
 library(extrafont)
 font_import() # import all your fonts
 fonts() 
