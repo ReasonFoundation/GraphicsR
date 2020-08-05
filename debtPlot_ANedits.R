@@ -200,7 +200,8 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
 }
 ##Plot graph
 debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
-savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png")
+savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png",
+         width_pixels = 600, height_pixels = 400)
 #With Title, caption and grid
 debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
 #debtPlot(PERSI.debt, caption = F, grid = F, ticks = T)
