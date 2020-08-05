@@ -7,7 +7,9 @@ library(data.table)
 library(tidyverse)
 
 reason_color_pal()
-
+library(extrafont)
+font_import(pattern="Roboto")
+loadfonts(device = "win", quiet = TRUE)
 ##Palette
 #https://www.rapidtables.com/web/color/Web_Safe.html
 palette_reason <- data.table(
@@ -118,7 +120,7 @@ tick <- c("axis.ticks = ggplot2::element_blank(),
 
 ####Edit detPlot() manually
 ############
-debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE) {
+debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, font) {
   
   data <- data %>%
     dplyr::filter(data$uaal != 0)
@@ -177,9 +179,6 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
       expand = c(0, 0)
     )+
     geom_hline(yintercept=0, linetype="solid", color = "black", size = 0.5)+
-    #geom_vline(data=graph, mapping=aes(xintercept=graph$year), color="blue")+
-    #ggplot2::theme(axis.text.x = element_text(vjust = 10*(1+(abs(y_minimum)/y_maximum))))+
-    
    ##Adding titles & caption
     labs(title = paste(title), 
          caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
@@ -194,14 +193,16 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
                                 expand = c(0, 0)) +#Added blanck ticks to x-axis
     
     ggplot2::theme(legend.position = "none")+
+    ggplot2::theme(text = element_text(family = paste(font), size = 9))+ 
     ##Adding Gridlines
     ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
                            paste(palette_reason$SpaceGrey),"white"),size = (1)))
 }
 ##Plot graph
-debtPlot(PERSI.debt)
+debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
+savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png")
 #With Title, caption and grid
-#debtPlot(PERSI.debt, "TITLE", caption = TRUE, grid = TRUE, ticks = TRUE)
+debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
 #debtPlot(PERSI.debt, caption = F, grid = F, ticks = T)
 
 ############
