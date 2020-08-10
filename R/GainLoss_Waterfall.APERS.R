@@ -3,15 +3,18 @@ library(tidyverse)
 urlfile="https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv"
 APERSData <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
 
-APERSData <- as.data.table(APERSData)
-y = APERSData[,lapply(.SD,sum),.SDcols=colnames(APERSData)]*1e-6
-y = t(y[,2:8])
+APERSData <- as.data.table(APERSData)# coverted to data.table
+y = APERSData[,lapply(.SD,sum),.SDcols=colnames(APERSData)]*1e-6# sum values by each column
+y = t(y[,2:8])#Saving needed columns and transposing table for graphics
 
+#Creating labels and measures
 x= c("Underperforming Investments", "Benefit Changes & Other", "Changes in Methods and Assumption", "Negative Amortization", "Actual Demographic Performance", "Pay Increase not given","Net Change to Unfunded Liability")
 measure= c("relative", "relative", "relative", "relative", "relative","relative", "total")
 
+#Seting labels to factors and saving as data.frame
 data = data.frame(x=factor(x,levels=x),measure,y)
 
+#Creating waterfall chart with plotly
 fig <- plot_ly(
   data, name = "Data", type = "waterfall", measure = ~measure,
   x = ~x, textposition = "outside", y= ~y, text =~"",
@@ -24,4 +27,3 @@ fig <- fig %>%
          showlegend = FALSE)
 
 fig
-
