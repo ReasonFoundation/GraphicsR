@@ -1,44 +1,31 @@
-##Updated debtPlot*(version ANedits)
+####### Reason Foundation
+##### Sample Graphs/Charts in R
+#### By Anil Niraula
+### Data: Reason
 
-##############
-library(pensionviewr)
+rm(list=ls())
+###Load/install packages
+#R.Version()
+#https://github.com/ReasonFoundation/pensionviewr
+#Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
 library(reasontheme)
-library(data.table)
+library(pensionviewr)
+library(ggplot2)
 library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
 
-reason_color_pal()
-library(extrafont)
-font_import(pattern="Roboto")
-loadfonts(device = "win", quiet = TRUE)
-##Palette
-#https://www.rapidtables.com/web/color/Web_Safe.html
-palette_reason <- data.table(
-  Orange = "#FF6633", 
-  LightOrange = "#FF9933",
-  DarkGrey = "#333333", 
-  SpaceGrey = "#A69FA1",
-  DarkBlue = "#0066CC",
-  GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
-  LightBlue = "#66B2FF", 
-  SatBlue = "#3366CC", 
-  Green = "#669900",
-  LightGreen = "#00CC66",
-  Red = "#CC0000",
-  LightRed = "#FF0000")
-#https://www.colorbook.io/hexcolors/view/A69FA1
-
-#rgb1 <- col2rgb(palette_reason$Yellow)/255
-#rownames(rgb1) <- c("red", "green", "blue")
-#rgb1
-#Custom color code
-#ColorName <- rgb(0.2,0.2,0.4)
-#ColorName  
-
-###
-##Pull PERSI data
+  
 ##Load list of plans
-pl <- planList()
+pl <- data.table(planList())
 
 columns <- c("total_pension_liability_dollar", "wage_inflation",
              "payroll_growth_assumption", "other_contribution_dollar",
@@ -47,15 +34,16 @@ columns <- c("total_pension_liability_dollar", "wage_inflation",
              "statutory_payment_percentage")
 
 #Custom function to load filtered data from the database
-filteredData <- function(data, plan, fy){
-  Plan <- data.table(pullData(data, plan))
+filteredData <- function(plan, y, fy){
+  Plan <- data.table(pullData(plan, y))
   ##Create missing columns for plans with no data for variables in "columns" vector
   for (i in (1:length(columns))){
     if(sum((colnames(Plan) == columns[i]))==0) {
       Plan[,columns[i] := NA] }
   }
   ####
-  Plan <- Plan[year > fy-1]
+  Plan <- Plan %>%
+    filter(year > fy-1)
   Plan <- Plan %>%
     select(
       year,
@@ -80,6 +68,7 @@ filteredData <- function(data, plan, fy){
       benefit_payments = benefit_payments_dollar,
       refunds = refunds_dollar,#added
       admin_exp = administrative_expense_dollar,
+      cost_structure,
       payroll = covered_payroll_dollar,
       ee_contribution = employee_contribution_dollar,
       ee_nc_pct = employee_normal_cost_percentage,
@@ -105,27 +94,64 @@ filteredData <- function(data, plan, fy){
     )
 }
 
+###########
 ####Load Idaho PERS data
 #View(pl$display_name)
-PERSI.debt <- filteredData(pl, "Idaho Public Employee Retirement System", 2001)
-PERSI.debt$year <- as.numeric(PERSI.debt$year)
+IPERS <- filteredData(pl, "Idaho Public Employee Retirement System", 2001)
+IPERS$year <- as.numeric(IPERS$year)
 #Set to data.frame for visualization
-IPERS <- data.frame(PERSI.debt)
-###########
-#set reasontheme
-set_reason_theme(style = "slide")
-tick <- c("axis.ticks = ggplot2::element_blank(),
-          axis.ticks.x = ggplot2::element_blank(),
-          axis.ticks.y = ggplot2::element_blank()")
+IPERS <- data.frame(IPERS)
 
-####Edit detPlot() manually
-############
-debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, font) {
-  
+#Graph without a theme
+ggplot(IPERS, aes(x = year, y = uaal))+
+  geom_line(color = "red")+
+  theme_bw()
+
+###Sample ggplot theme
+plotTheme <- ggplot2::theme(     panel.grid.major = element_blank(),
+                                 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
+                                 plot.margin = margin(0, 0,0,0, "cm"),
+                                 #plot.margin = margin(0.1, 3,0,3, "cm"),
+                                 axis.text.y = element_text(size=8, color = "black"),
+                                 axis.text.x = element_text(size=8, color = "black", angle = 90, hjust = 1, vjust = 0.5),
+                                 legend.title = element_text(size = 8, colour = "white", face = "bold"),
+)  
+
+###Plot IPERS UAL with custom theme
+ggplot(IPERS, aes(x = year, y = uaal))+
+  geom_line(color = "red")+
+  theme_bw()+
+  plotTheme
+
+#### To set reasonTheme you need ot have "Calibri" font downloaded
+#INSTUCTIONS:
+#https://rdrr.io/github/ReasonFoundation/reasontheme/man/calibri_install.html
+calibri_test()
+#[1] "Calibri is imported and registered." -- Means you are ok
+calibri_install()#to install
+
+#########
+##To set the theme for ppt type:
+set_reason_theme(style = "slide")
+
+###Using debtPlot() 
+###function from pensionviewr package (need year, uaal, and funded_ratio)
+IPERS.debt <- data.table(IPERS %>% select(year, uaal, funded_ratio))
+debtPlot(IPERS.debt)
+
+##########Copied function details below
+### Source: https://github.com/ReasonFoundation/pensionviewr/blob/master/R/debt_plot.R
+##Things to experiment with:
+#- Number of Ticks on Y-axis
+#- Changing colors
+#- Removing red line above the overfunding green area
+#- Create color palette
+
+debtPlot <- function(data) {
   data <- data %>%
     dplyr::filter(data$uaal != 0)
   # extrapolate between years linearly
-  extrapo <- stats::approx(data$year, data$uaal,  n = 10000)
+  extrapo <- stats::approx(data$year, data$uaal, n = 10000)
   extrapo2 <- stats::approx(data$year, data$funded_ratio, n = 10000)
   graph <-
     data.frame(year = extrapo$x,
@@ -136,24 +162,25 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
     dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 0 ~ "positive",
                                           .data$uaal < 0 ~ "negative"))
   
-  y_minimum <- min(graph$uaal)
+  
   y_maximum <- max(graph$uaal)
+  
   ggplot2::ggplot(graph,
                   ggplot2::aes(x = graph$year)) +
-    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign)) +#Removed "color" paramater
+    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign, colour = graph$sign)) +
     ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * (y_maximum)),
-                       color = palette_reason$GreyBlue,#Referenced Color Palette
-                       size = 1.7) +#Increased Size 1.
-    #ggtitle(title)+
+                       color = "#3300FF",
+                       size = 1) +
     # axis labels
     ggplot2::labs(y = "Unfunded Accrued Actuarial Liabilities (Millions)", x = NULL) +
     
     # colors assigned to pos, neg
     ggplot2::scale_fill_manual(
-      values = c("negative" = paste(palette_reason$Green),#Referenced Color Palette
-                 "positive" = paste(palette_reason$Red)),#Referenced Color Palette
+      values = c("negative" = "#669900",
+                 "positive" = "#CC0000"),
       aesthetics = c("colour", "fill")
     ) +
+    
     # sets the y-axis scale
     ggplot2::scale_y_continuous(
       # creates 10 break points for labels
@@ -162,58 +189,26 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
       labels = scales::dollar_format(
         prefix = "$",
         scale = (1e-6),
-        largest_with_cents = 1,
-      ), 
-      limits = c(y_minimum, y_maximum*1.2),
+        largest_with_cents = 1
+      ),
       # defines the right side y-axis as a transformation of the left side axis, maximum UAAL = 100%, sets the breaks, labels
       sec.axis = ggplot2::sec_axis(
         ~ . / (y_maximum / 100),
         breaks = scales::pretty_breaks(n = 10),
         name = "Funded Ratio",
-        #set limits
         labels = function(b) {
           paste0(round(b, 0), "%")
         }
       ),
       # removes the extra space so the fill is at the origin
       expand = c(0, 0)
-    )+
-    geom_hline(yintercept=0, linetype="solid", color = "black", size = 0.5)+
-   ##Adding titles & caption
-    labs(title = paste(title), 
-         caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
-    )+
-    ggplot2::theme(axis.ticks = if(isFALSE(ticks)){ggplot2::element_blank()}else{ggplot2::element_line()}
-                   )+
-   # coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
-    coord_cartesian(expand = FALSE, #turn off axis expansion (padding)
-                    xlim = c(2001, 2019), ylim = c(y_minimum, y_maximum*1.2))+ #manually set limits
-    # sets the x-axis scale
-    ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
-                                expand = c(0, 0)) +#Added blanck ticks to x-axis
+    ) +
     
-    ggplot2::theme(legend.position = "none")+
-    ggplot2::theme(text = element_text(family = paste(font), size = 9))+ 
-    ##Adding Gridlines
-    ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
-                           paste(palette_reason$SpaceGrey),"white"),size = (1)))
+    # sets the x-axis scale
+    ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 1), 1),
+                                expand = c(0, 0)) +
+    
+    ggplot2::theme(legend.position = "none")
 }
-##Plot graph
-debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
-savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png",
-         width_pixels = 600, height_pixels = 400)
-#With Title, caption and grid
-debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
-#debtPlot(PERSI.debt, caption = F, grid = F, ticks = T)
 
-############
-
-#https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R
-#save_plot <- function (plot_grid, width, height, save_filepath) {
-#  grid::grid.draw(plot_grid)
-#  #save it
-#  ggplot2::ggsave(filename = save_filepath,
-#                  plot=plot_grid, width=(width/72), height=(height/72),  bg="white")
-#}
-#save_plot(plot1, 600, 400, "/users/Anil/downlaods")
 ####
