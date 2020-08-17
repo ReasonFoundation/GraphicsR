@@ -1,3 +1,8 @@
+### PERSI Investment Returns ###
+## Data: Datatbase + Manual(AVA returns)
+## Base: linePlot() function in `pensionviewr`
+# By: Anil
+
 rm(list=ls())
 ###Load/install packages
 #R.Version()
@@ -154,14 +159,13 @@ linePlot <- function(data,
 }
 
 #Line Plot -- Inv.Returns
-
-
 graph <- linePlot(PERSI.data,.var1 = "return_1yr",.var2 = "arr", .var3 = "V1", .var4 = "ava_return",
          labelY = "",
          label1 = "Market Valued Returns (Actual)",
          label2 = "Assumed Rate of Return",
          label3 = "10-Year Geometric Rolling Average",
          label4 = "Actuarially Valued Investment Returns")
+graph
 
-savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
-         width_pixels = 600, height_pixels = 400)
+#savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
+#         width_pixels = 600, height_pixels = 400)
