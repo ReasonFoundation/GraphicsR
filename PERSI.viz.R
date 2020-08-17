@@ -2,6 +2,7 @@
 ##### Sample Graphs/Charts in R
 #### By Anil Niraula
 ### Data: Reason
+#JC comment
 
 rm(list=ls())
 ###Load/install packages
