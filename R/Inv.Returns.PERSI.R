@@ -1,13 +1,45 @@
+rm(list=ls())
+###Load/install packages
+#R.Version()
+#https://github.com/ReasonFoundation/pensionviewr
+#Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
+library(reasontheme)
+library(pensionviewr)
+#library(janitor)
+library(grid)#https://bookdown.org/rdpeng/RProgDA/the-grid-package.html
+library(tidyverse)
+#library(openxlsx)
+library(tseries)
+library(plyr)
+#library(ggplot2)
+library(data.table)
+library(openxlsx)
+#library(readr)
+library(rsconnect)
+library(base64enc)
+#Shiny-----------
+library(shiny)
+library(shinyWidgets)
+#library(shinyFiles)
+library(DT)
+library(plotly)
+
 PERSI.data <- pullStateData(2001)
 PERSI.data <- filterData(PERSI.data, 2001)
 
 pl <- planList()
-IPERS <- filteredData(pl, "Idaho Public Employee Retirement System", 2001)
+PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
+#View(PERSI.data)
 
-IPERS$year <- as.numeric(IPERS$year)
+
+PERSI.data$year <- as.numeric(PERSI.data$year)
 #Set to data.frame for visualization
-IPERS <- data.frame(IPERS)
-#View(IPERS)
+PERSI.data <- data.frame(PERSI.data)
+#View(PERSI.data)
 
 palette_reason <- data.table(
   Orange = "#FF6633", 
@@ -31,7 +63,7 @@ geomean <- function(x) {
   x <- x +1
   exp(mean(log(x)))-1 
 }
-returns <- as.numeric(IPERS$return_1yr)
+returns <- as.numeric(PERSI.data$return_1yr)
 nyear <- 10
 rolling <- geomean(returns[1:nyear])
 n <- length(na.omit(returns))-nyear
@@ -41,25 +73,25 @@ for(i in 1:n){
 }
 rolling <- data.table(rolling)
 
-IPERS <- data.table(rbind.fill(rolling, IPERS))
-IPERS[(IPERS[!is.na(return_1yr),.N]+1):(IPERS[!is.na(return_1yr),.N]+rolling[,.N])]$V1<- IPERS[(1:rolling[,.N])]$V1
-IPERS <- IPERS[!(1:rolling[,.N])]
+PERSI.data <- data.table(rbind.fill(rolling, PERSI.data))
+PERSI.data[(PERSI.data[!is.na(return_1yr),.N]+1):(PERSI.data[!is.na(return_1yr),.N]+rolling[,.N])]$V1<- PERSI.data[(1:rolling[,.N])]$V1
+PERSI.data <- PERSI.data[!(1:rolling[,.N])]
 # UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
-#View(IPERS)
+#View(PERSI.data)
 ###############
-#Adding AVA returns
+#Adding AVA returns (Arkansas ERS example*)
 
 ava_returns <- matrix(0, 19,1)
 ava_returns[,1] <- c(NA, NA, NA, NA, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50)
 #View(ava_returns)
 ava_returns <- data.table(ava_returns/100)
 
-IPERS <- data.table(IPERS)
-IPERS <- IPERS[, ava_return := ava_returns]
+PERSI.data <- data.table(PERSI.data)
+PERSI.data <- PERSI.data[, ava_return := ava_returns]
 
-IPERS$year <- as.numeric(IPERS$year)
+PERSI.data$year <- as.numeric(PERSI.data$year)
 
-IPERS <- data.frame(IPERS)
+PERSI.data <- data.frame(PERSI.data)
 
 
 ##Modified Lineplot
@@ -117,16 +149,19 @@ linePlot <- function(data,
     ) +
     
     labs(x = element_blank(), y = labelY)+
-    theme(legend.text=element_text(size=10))+ #Added element to control legend font size
+    theme(legend.text=element_text(size=12))+ #Added element to control legend font size
     theme(legend.position="bottom")
 }
 
 #Line Plot -- Inv.Returns
 
 
-linePlot(IPERS,.var1 = "return_1yr",.var2 = "arr", .var3 = "V1", .var4 = "ava_return",
+graph <- linePlot(PERSI.data,.var1 = "return_1yr",.var2 = "arr", .var3 = "V1", .var4 = "ava_return",
          labelY = "",
          label1 = "Market Valued Returns (Actual)",
          label2 = "Assumed Rate of Return",
          label3 = "10-Year Geometric Rolling Average",
          label4 = "Actuarially Valued Investment Returns")
+
+savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
+         width_pixels = 600, height_pixels = 400)

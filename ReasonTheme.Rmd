@@ -31,21 +31,15 @@ Packages: `pensionviewr` & `reasonTheme`
 
 palette_reason <- data.frame(
   Orange = "#FF6633", 
-<<<<<<< HEAD
   Yellow = "#FFCC33", 
-=======
   LightOrange = "#FF9933",
->>>>>>> e03faf1331f31adc57fdc6a3904d27d0476f12d4
   DarkGrey = "#333333", 
   SpaceGrey = "#A69FA1",
   DarkBlue = "#0066CC",
   GreyBlue = "#6699CC", 
-<<<<<<< HEAD
   LightBlue = "#3399CC", 
-=======
   Yellow = "#FFCC33", 
   LightBlue = "#66B2FF", 
->>>>>>> e03faf1331f31adc57fdc6a3904d27d0476f12d4
   SatBlue = "#3366CC", 
   Green = "#669900",
   LightGreen = "#00CC66",
@@ -107,7 +101,8 @@ rect(5, 15, 10, 30, col = as.character(palette_reason[1,i]), border = "transpare
 
 ## Original Mountain of Debt Plot using deptPlot() from `pensionviewr`
   ![Original Debt Plot - PERSI](graphs/DebtPlot.Orig.jpeg)
-  
+  ## Modified linePlot() from `pensionviewr`(added variables, color palette, and moved legends)
+  ![Updated Inv.returns Graph - PERSI](graphs/Inv.Returns.PERSI.png)
   
 ```{r, echo=FALSE}
 ```
