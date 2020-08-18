@@ -155,7 +155,7 @@ spPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TR
                        size = 1.7) + #Increased Size 1.
     #ggtitle(title)+
     # axis labels
-    ggplot2::labs(y = "Unfunded Accrued Actuarial Liabilities (Millions)", x = NULL) +
+    ggplot2::labs(y = "S&P 500 Index (Average Annual Value)", x = NULL) +
     
     # colors assigned to pos, neg
     ggplot2::scale_fill_manual(
@@ -187,7 +187,7 @@ spPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TR
       expand = c(0, 0)
     )+
     # adds a vertical vline(xintercept=) or horizontal hline(yintercept=) 
-    geom_vline(xintercept=2010, linetype="solid", color = "black", size = 0.5)+
+    geom_vline(xintercept=2009, linetype="solid", color = "black", size = 0.5)+
     ##Adding titles & caption
     labs(title = paste(title), 
          caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
