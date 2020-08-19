@@ -24,7 +24,6 @@ library(rsconnect)
 library(dplyr)
 library(plyr)
 
-  
 ##Load list of plans
 pl <- data.table(planList())
 

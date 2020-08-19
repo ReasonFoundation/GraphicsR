@@ -40,7 +40,6 @@ pl <- planList()
 PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
 #View(PERSI.data)
 
-
 PERSI.data$year <- as.numeric(PERSI.data$year)
 #Set to data.frame for visualization
 PERSI.data <- data.frame(PERSI.data)
@@ -50,6 +49,7 @@ palette_reason <- data.table(
   Orange = "#FF6633", 
   LightOrange = "#FF9900",
   DarkGrey = "#333333", 
+  LightGrey = "#CCCCCC",
   SpaceGrey = "#A69FA1",
   DarkBlue = "#0066CC",
   GreyBlue = "#6699CC", 
@@ -134,10 +134,10 @@ linePlot <- function(data,
     dplyr::mutate_all(dplyr::funs(as.numeric)) %>%
     tidyr::gather(key = "keys", value = "amount", -.data$year)
   
-  lineColors <- c(palette_reason$Orange,palette_reason$Yellow, palette_reason$SatBlue, palette_reason$SpaceGrey) #Updated palette to reason one
+  lineColors <- c(palette_reason$Orange,palette_reason$Yellow, palette_reason$SatBlue, palette_reason$LightGrey) #Updated palette to reason one
   options(repr.plot.width = 1, repr.plot.height = 0.75)
   ggplot2::ggplot(graph, ggplot2::aes(x = graph$year, y = graph$amount * 100)) +
-    ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(graph$keys), 15)), size = 1.5) + #Added str_wrap(to cut legends)
+    ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(graph$keys), 15)), size = 1.5) + #Added str_wrap(to cut legend text)
     ggplot2::scale_colour_manual(values = lineColors) +
     ggplot2::geom_hline(yintercept = 0, color = "black") +
     
@@ -155,16 +155,16 @@ linePlot <- function(data,
     
     labs(x = element_blank(), y = labelY)+
     theme(legend.text=element_text(size=12))+ #Added element to control legend font size
-    theme(legend.position="bottom")
+    theme(legend.position= c(0.51, 0.1)) #Moved legend to the bottom
 }
 
 #Line Plot -- Inv.Returns
 graph <- linePlot(PERSI.data,.var1 = "return_1yr",.var2 = "arr", .var3 = "V1", .var4 = "ava_return",
-         labelY = "",
-         label1 = "Market Valued Returns (Actual)",
-         label2 = "Assumed Rate of Return",
-         label3 = "10-Year Geometric Rolling Average",
-         label4 = "Actuarially Valued Investment Returns")
+                  labelY = "",
+                  label1 = "Market Valued Returns (Actual)",
+                  label2 = "Assumed Rate of Return",
+                  label3 = "10-Year Geometric Rolling Average",
+                  label4 = "Actuarially Valued Investment Returns")
 graph
 
 #savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
