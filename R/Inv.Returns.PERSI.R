@@ -33,10 +33,14 @@ library(shinyWidgets)
 library(DT)
 library(plotly)
 
+
+###################
+Using 2 New Functions to download and filter datat from datatabase
 PERSI.data <- pullStateData(2001)
 PERSI.data <- filterData(PERSI.data, 2001)
 
 pl <- planList()
+#filter for PERSI
 PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
 #View(PERSI.data)
 
@@ -45,6 +49,7 @@ PERSI.data$year <- as.numeric(PERSI.data$year)
 PERSI.data <- data.frame(PERSI.data)
 #View(PERSI.data)
 
+#Reason R color palette
 palette_reason <- data.table(
   Orange = "#FF6633", 
   LightOrange = "#FF9900",
@@ -83,9 +88,9 @@ PERSI.data[(PERSI.data[!is.na(return_1yr),.N]+1):(PERSI.data[!is.na(return_1yr),
 PERSI.data <- PERSI.data[!(1:rolling[,.N])]
 # UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
 #View(PERSI.data)
+
 ###############
 #Adding AVA returns (Arkansas ERS example*)
-
 ava_returns <- matrix(0, 19,1)
 ava_returns[,1] <- c(NA, NA, NA, NA, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50)
 #View(ava_returns)
