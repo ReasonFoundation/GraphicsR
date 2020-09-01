@@ -94,7 +94,7 @@ linePlot <- function(data,
                      label1 = "ADEC Contribution Rate",
                      label2 = "Actual Contribution Rate",
                      label3 = "10-Year Geometric Rolling Average",
-                     label4 = "Actuarially Valued Investment Returns") {
+                     label4 = "Actuarially Valued Investment Returns",title = NULL, caption = FALSE) {
   
   #Added 3rd variable
   var1 <- rlang::sym(.var1)
@@ -127,7 +127,7 @@ linePlot <- function(data,
     ggplot2::geom_hline(yintercept = 0, color = "black") +
     
     ggplot2::scale_y_continuous(
-      breaks = seq(-24, 21, by=3), limits = c(-24, 21), #added limits and expanded break scale
+      breaks = seq(-27, 21, by=3), limits = c(-27, 21), #added limits and expanded break scale
       labels = function(b) {
         paste0(round(b, 0), "%")
       },
@@ -138,9 +138,11 @@ linePlot <- function(data,
                                 expand = c(0, 0)
     ) +
     
-    labs(x = element_blank(), y = labelY)+
-    theme(legend.text=element_text(size=12))+ #Added element to control legend font size
-    theme(legend.position= c(0.51, 0.1)) #Moved legend to the bottom
+    labs(title = paste(title), x = element_blank(), y = labelY, caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste("")))+
+    theme(legend.text=element_text(size=12),
+          axis.text.y = element_text(size=11, color = "black"),
+          axis.text.x = element_text(size=11, color = "black"))+#Added element to control legend font size
+    theme(legend.position= c(0.45, 0.12)) #Moved legend to the bottom
 }
 
 #Line Plot -- Inv.Returns
@@ -149,7 +151,7 @@ graph <- linePlot(ERB.returns,.var1 = "mva",.var2 = "arr", .var3 = "V1", .var4 =
                   label1 = "Market Valued Returns (Actual)",
                   label2 = "Assumed Rate of Return",
                   label3 = "10-Year Geometric Rolling Average",
-                  label4 = "Actuarially Valued Investment Returns")
+                  label4 = "Actuarially Valued Investment Returns", title = "NM ERB Investment Returns (2001-20)", caption = TRUE)
 graph
 
 #savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
