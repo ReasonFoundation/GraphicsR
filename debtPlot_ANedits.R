@@ -111,6 +111,7 @@ PERSI.debt <- filteredData(pl, "Idaho Public Employee Retirement System", 2001)
 PERSI.debt$year <- as.numeric(PERSI.debt$year)
 #Set to data.frame for visualization
 IPERS <- data.frame(PERSI.debt)
+View(PERSI.debt)
 ###########
 #set reasontheme
 set_reason_theme(style = "slide")
@@ -199,12 +200,12 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
                            paste(palette_reason$SpaceGrey),"white"),size = (1)))
 }
 ##Plot graph
-debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
-savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png",
-         width_pixels = 600, height_pixels = 400)
+#debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
+#savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png",
+#         width_pixels = 600, height_pixels = 400)
 #With Title, caption and grid
-debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
-#debtPlot(PERSI.debt, caption = F, grid = F, ticks = T)
+#debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
+debtPlot(PERSI.debt, caption = F, grid = F, ticks = T,font = "Calibri")
 
 ############
 #https://github.com/bbc/bbplot/blob/master/R/finalise_plot.R

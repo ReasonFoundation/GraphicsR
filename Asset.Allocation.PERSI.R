@@ -45,7 +45,6 @@ palette_reason <- data.table(
   Red = "#CC0000",
   LightRed = "#FF0000")
 
-
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),
                                panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
                                plot.margin = margin(0, 0,0,0, "cm"),
