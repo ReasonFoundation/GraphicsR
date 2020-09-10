@@ -47,7 +47,7 @@ palette_reason <- data.table(
 
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),
                                panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
-                               plot.margin = margin(0, 0,0,0, "cm"),
+                               plot.margin = margin(1, 1,0,0, "cm"),
                                axis.text.y = element_text(size=9, color = "black"),
                                axis.text.x = element_text(size=9, color = "black", angle = 0, hjust = 0.5, vjust = 0),
                                legend.title = element_text(size = 9, colour = "white", face = "bold"))
@@ -69,9 +69,9 @@ ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill = variable, group
   scale_fill_manual(values=c(palette_reason$Yellow,palette_reason$Orange, 
                              palette_reason$DarkGrey, palette_reason$LightBlue, palette_reason$SatBlue))+
   scale_y_continuous(labels = function(x) paste0(x*100,"%"), name = "",
-                     breaks = seq(0, 1, by = 0.1), limits = c(0, 1))+
+                     breaks = seq(0, 1, by = 0.1), limits = c(0, 1), expand=c(0,0))+
   scale_x_continuous(labels = function(x) paste0(x, ""), name = "",
-                     breaks = seq(2001, 2019, by = 2), limits = c(2001, 2019))+
+                     breaks = seq(2001, 2019, by = 2), limits = c(2001, 2019), expand=c(0,0))+
   theme_bw()+
   plotTheme+
   theme(legend.position="bottom")
