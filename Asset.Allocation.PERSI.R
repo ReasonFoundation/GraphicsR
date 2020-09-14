@@ -68,7 +68,7 @@ PERSI.assets <- melt(PERSI.assets, id.vars="year")
 ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill = variable, group = variable), position="fill")+
   scale_fill_manual(values=c(palette_reason$Yellow,palette_reason$Orange, 
                              palette_reason$DarkGrey, palette_reason$LightBlue, palette_reason$SatBlue))+
-  scale_y_continuous(labels = function(x) paste0(x*100,"%"), name = "",
+  scale_y_continuous(labels = function(x) paste0(x*100,"%"), name = "% of Investment Portfolio",
                      breaks = seq(0, 1, by = 0.1), limits = c(0, 1), expand=c(0,0))+
   scale_x_continuous(labels = function(x) paste0(x, ""), name = "",
                      breaks = seq(2001, 2019, by = 2), limits = c(2001, 2019), expand=c(0,0))+
