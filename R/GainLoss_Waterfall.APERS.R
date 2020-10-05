@@ -25,9 +25,4 @@ fig <- fig %>%
          yaxis = list(title = "Change in Unfunded Liability ($Billions)"),
          autosize = TRUE,
          showlegend = FALSE)
-
 fig
-<<<<<<< HEAD
-
-=======
->>>>>>> e03faf1331f31adc57fdc6a3904d27d0476f12d4

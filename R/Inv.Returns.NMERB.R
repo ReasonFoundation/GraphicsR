@@ -37,24 +37,7 @@ library(plotly)
 urlfile2="https://raw.githubusercontent.com/ReasonFoundation/GraphicsR/master/R/Inv.Returns.NMERB.csv"
 ERB.returns <- data.table(read_csv(url(urlfile2), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = cols(.default = "n")))
 
-#View(PERSI.data)
-
-palette_reason <- data.table(
-  Orange = "#FF6633", 
-  LightOrange = "#FF9900",
-  DarkGrey = "#333333", 
-  LightGrey = "#CCCCCC",
-  SpaceGrey = "#A69FA1",
-  DarkBlue = "#0066CC",
-  GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
-  LightBlue = "#66B2FF", 
-  SatBlue = "#3366CC", 
-  Green = "#669900",
-  LightGreen = "#00CC66",
-  Red = "#CC0000",
-  LightRed = "#FF0000")
-
+#View(ERB.returns)
 
 #####GEOMEAN FUNCTION
 geomean <- function(x) {
@@ -80,9 +63,11 @@ ERB.returns <- ERB.returns[!(1:rolling[,.N])]
 ###############
 #Adding AVA returns (Arkansas ERS example*)
 
+ERB.returns <- data.table(ERB.returns)
+ERB.returns[year == 2020]$arr <- 7.25
+ERB.returns[year == 2020]$ava <- 5.73
 ERB.returns <- data.frame(ERB.returns)
-View(ERB.returns)
-
+#View(ERB.returns)
 
 ##Modified Lineplot
 linePlot <- function(data,
@@ -142,7 +127,7 @@ linePlot <- function(data,
     theme(legend.text=element_text(size=12),
           axis.text.y = element_text(size=11, color = "black"),
           axis.text.x = element_text(size=11, color = "black"))+#Added element to control legend font size
-    theme(legend.position= c(0.45, 0.12)) #Moved legend to the bottom
+    theme(legend.position= c(0.5, 0.12)) #Moved legend to the bottom
 }
 
 #Line Plot -- Inv.Returns
