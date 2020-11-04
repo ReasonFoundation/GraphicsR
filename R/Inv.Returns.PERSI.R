@@ -48,23 +48,6 @@ PERSI.data$year <- as.numeric(PERSI.data$year)
 PERSI.data <- data.frame(PERSI.data)
 #View(PERSI.data)
 
-#Reason R color palette
-palette_reason <- data.table(
-  Orange = "#FF6633", 
-  LightOrange = "#FF9900",
-  DarkGrey = "#333333", 
-  LightGrey = "#CCCCCC",
-  SpaceGrey = "#A69FA1",
-  DarkBlue = "#0066CC",
-  GreyBlue = "#6699CC", 
-  Yellow = "#FFCC33", 
-  LightBlue = "#66B2FF", 
-  SatBlue = "#3366CC", 
-  Green = "#669900",
-  LightGreen = "#00CC66",
-  Red = "#CC0000",
-  LightRed = "#FF0000")
-
 
 #####GEOMEAN FUNCTION
 geomean <- function(x) {
@@ -305,9 +288,11 @@ asset.alloc <- (ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill =
   plotTheme+
   theme(legend.position="bottom"))
 
+
+#asset.alloc
 ##Combine Graphs]
-library(ggpubr)
-ggarrange(debt.plot, graph, asset.alloc, ncol = 1, nrow = 3)
+#library(ggpubr)
+#ggarrange(debt.plot, graph, asset.alloc, ncol = 1, nrow = 3)
 
 #savePlot(graph, source = "", save_filepath = "/Users/anilniraula/Downloads/Inv.Returns.PERSI.png",
 #         width_pixels = 600, height_pixels = 400)
