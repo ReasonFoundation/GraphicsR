@@ -33,7 +33,6 @@ library(shinyWidgets)
 library(DT)
 library(plotly)
 
-
 urlfile2="https://raw.githubusercontent.com/ReasonFoundation/GraphicsR/master/R/Inv.Returns.NMERB.csv"
 ERB.returns <- data.table(read_csv(url(urlfile2), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = cols(.default = "n")))
 

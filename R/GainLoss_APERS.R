@@ -99,7 +99,9 @@ server <- function(input, output, session){
   output$text1 <- renderText({
     paste(HTML(
       "Source:"), tags$a(href="https://reason.org/topics/pension-reform/", "Pension Integrity Project at Reason Foundation"),"<br>", 
-      "analysis of APERS CAFRs and valuation reports.", sep="\n")
+      "analysis of APERS CAFRs and valuation reports.", "<br>", 
+      "Data represents cumulative unfunded liability by gain/loss category.",
+      sep="\n")
      })
   
   #[1]Pulling scv file from GitHub containing APERS gain/loss data

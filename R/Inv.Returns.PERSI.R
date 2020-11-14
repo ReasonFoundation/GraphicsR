@@ -5,7 +5,7 @@
 
 rm(list=ls())
 ###Load/install packages
-#R.Version()
+R.Version()
 #https://github.com/ReasonFoundation/pensionviewr
 #Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
 #install.packages('devtools')
