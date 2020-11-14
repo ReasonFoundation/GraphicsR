@@ -14,11 +14,23 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## A History of Weakening Solvency (1995-2019) w/ R Code
-```{r graph, fig.width=7, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r graph, fig.width=7, fig.height=4, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
 ## Base: linePlot() function in `pensionviewr`
 # By: Anil, Swaroop, and Jen
+
+
+##linePlot() function parameters:
+
+#data = data in data.frame, tibble, or data.table format,
+#yaxisMin & yaxisMax = Y-axis mininum and maximum values
+#yaxisSeq = set sequency of Major breaks
+#yaxisScale = 100 for percentages
+#format = set Y-axis format to either "%", "$", or empty
+#str = set number of srings at which to cut legend text (default is 20),
+#labelY = title of Y-axis,
+#lab1 - lab5 = character string of line titles/names (default is 0 Lines)
 
 rm(list=ls())
 library(reasontheme)
@@ -139,13 +151,15 @@ linePlot <- function(data, yaxisMin = NULL, yaxisMax = NULL, yaxisSeq = 5,
     ) +
     
     labs(x = element_blank(), y = labelY)+
-    theme(legend.text=element_text(size=12))+ #Added element to control legend font size
-    theme(legend.position= c(0.51, 0.1)) #Moved legend to the bottom
+    theme(legend.text=element_text(size=14))+ #Added element to control legend font size
+    theme(legend.direction = "vertical",
+                legend.box = "horizontal",
+                legend.position= c(0.42, 0.13)) #Moved legend to the bottom
 }
 
 #Line Plot -- Inv.Returns
-graph <- linePlot(PERSI.data, yaxisMin = -33, yaxisMax = 30, yaxisSeq = 3,
-                  yaxisScale = 100, format = "%", str = 20,
+graph <- linePlot(PERSI.data, yaxisMin = -27, yaxisMax = 21, yaxisSeq = 3,
+                  yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
                   lab3 = "Assumed Rate of Return", 
