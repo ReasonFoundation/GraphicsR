@@ -1,15 +1,30 @@
 ##Updated debtPlot*(version ANedits)
 
 ##############
-library(pensionviewr)
+rm(list=ls())
+###Load/install packages
+#R.Version()
+#https://github.com/ReasonFoundation/pensionviewr
+#Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
 library(reasontheme)
-library(data.table)
+library(pensionviewr)
+library(ggplot2)
 library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
 
-reason_color_pal()
-library(extrafont)
-font_import(pattern="Roboto")
-loadfonts(device = "win", quiet = TRUE)
+#reason_color_pal()
+#library(extrafont)
+#font_import(pattern="Roboto")
+#loadfonts(device = "win", quiet = TRUE)
 ##Palette
 #https://www.rapidtables.com/web/color/Web_Safe.html
 #https://www.colorbook.io/hexcolors/view/A69FA1
@@ -132,6 +147,7 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
 #width_pixels = 600, height_pixels = 400)
 #With Title, caption and grid
 #debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
+
 debtPlot(PERSI.debt, caption = F, grid = F, ticks = F,font = "Calibri")
 
 ############
@@ -142,5 +158,5 @@ debtPlot(PERSI.debt, caption = F, grid = F, ticks = F,font = "Calibri")
 #  ggplot2::ggsave(filename = save_filepath,
 #                  plot=plot_grid, width=(width/72), height=(height/72),  bg="white")
 #}
-save_plot(plot1, 600, 400, "/users/Anil/downlaods")
+#save_plot(plot1, 600, 400, "/users/Anil/downlaods")
 ####

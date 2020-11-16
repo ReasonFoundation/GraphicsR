@@ -1,20 +1,181 @@
 ---
 title: "SamplePPT (PERSI graphs)"
-author: "Anil"
+author: "Anil, Swaroop & Jen"
 date: "11/12/2020"
 font-family: 'Helvetica'
 output:
   powerpoint_presentation: default
+  reference_doc: "template-no-title.pptx"
 ---
 
-Reference: https://rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
-https://bookdown.org/yihui/rmarkdown/
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  #dev = "svg",
+  fig.width = 12,
+  fig.height = 7
+)
 ```
 
-## A History of Weakening Solvency (1995-2019) w/ R Code
-```{r graph, fig.width=7, fig.height=4, fig.align = "center", message=FALSE, warning=FALSE}
+
+### A History of Weakening Solvency (2001-2019) w/ R Code
+```{r debt, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+
+rm(list=ls())
+###Load/install packages
+#R.Version()
+#https://github.com/ReasonFoundation/pensionviewr
+#Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
+library(reasontheme)
+library(pensionviewr)
+library(ggplot2)
+library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
+
+#reason_color_pal()
+#library(extrafont)
+#font_import(pattern="Roboto")
+#loadfonts(device = "win", quiet = TRUE)
+##Palette
+#https://www.rapidtables.com/web/color/Web_Safe.html
+#https://www.colorbook.io/hexcolors/view/A69FA1
+
+#rgb1 <- col2rgb(palette_reason$Yellow)/255
+#rownames(rgb1) <- c("red", "green", "blue")
+#rgb1
+#Custom color code
+#ColorName <- rgb(0.2,0.2,0.4)
+#ColorName  
+
+###
+##Pull PERSI data
+##Load list of plans
+pl <- planList()
+
+#PULL DATA
+Data <- pullStateData(2001)
+Data <- filterData(Data,2001)
+#View(Data)
+PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
+PERSI.debt$year <- as.numeric(PERSI.debt$year)
+PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
+PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
+#Set to data.frame for visualization
+PERSI.debt <- data.table(PERSI.debt)
+PERSI.debt[,uaal := aal-ava]
+###########
+#set reasontheme
+set_reason_theme(style = "slide")
+
+####Edit detPlot() manually
+############
+debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, font) {
+  
+  data <- data %>%
+    dplyr::filter(data$uaal != 0)
+  # extrapolate between years linearly
+  extrapo <- stats::approx(data$year, data$uaal,  n = 10000)
+  extrapo2 <- stats::approx(data$year, data$funded_ratio, n = 10000)
+  graph <-
+    data.frame(year = extrapo$x,
+               uaal = extrapo$y,
+               funded_ratio = extrapo2$y) %>%
+    tidyr::drop_na()
+  graph <- graph %>%
+    dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 0 ~ "positive",
+                                          .data$uaal < 0 ~ "negative"))
+  
+  y_minimum <- min(graph$uaal)
+  y_maximum <- max(graph$uaal)
+  ggplot2::ggplot(graph,
+                  ggplot2::aes(x = graph$year)) +
+    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign)) +#Removed "color" parameter
+    ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * (y_maximum)),
+                       color = palette_reason$GreyBlue,#Referenced Color Palette
+                       size = 1.5) +#Increased Size 1.
+    #ggtitle(title)+
+    # axis labels
+    ggplot2::labs(y = "Unfunded Accrued Actuarial Liabilities (Millions)", x = NULL) +
+    
+    # colors assigned to pos, neg
+    ggplot2::scale_fill_manual(
+      values = c("negative" = paste(palette_reason$Green),#Referenced Color Palette
+                 "positive" = paste(palette_reason$Red)),#Referenced Color Palette
+      aesthetics = c("colour", "fill")
+    ) +
+    # sets the y-axis scale
+    ggplot2::scale_y_continuous(
+      # creates 10 break points for labels
+      breaks = scales::pretty_breaks(n = 10),
+      # changes the format to be dollars, without cents, scaled to be in billions
+      labels = scales::dollar_format(
+        prefix = "$",
+        scale = (1e-6),
+        largest_with_cents = 1,
+      ), 
+      limits = c(y_minimum, y_maximum*1.2),
+      # defines the right side y-axis as a transformation of the left side axis, maximum UAAL = 100%, sets the breaks, labels
+      sec.axis = ggplot2::sec_axis(
+        ~ . / (y_maximum / 100),
+        breaks = scales::pretty_breaks(n = 10),
+        name = "Funded Ratio",
+        #set limits
+        labels = function(b) {
+          paste0(round(b, 0), "%")
+        }
+      ),
+      # removes the extra space so the fill is at the origin
+      expand = c(0, 0)
+    )+
+    geom_hline(yintercept=0, linetype="solid", color = "black", size = 0.5)+
+   ##Adding titles & caption
+    labs(title = paste(title), 
+         caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
+    )+
+    ggplot2::theme(axis.ticks = if(isFALSE(ticks)){ggplot2::element_blank()}else{ggplot2::element_line()}
+                   )+
+    ggplot2::theme(axis.ticks.x = element_line(size = 0.5, color="black"))+
+    ggplot2::theme(axis.ticks.y = element_line(size = 0.5, color="black"))+
+    ggplot2::theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="bold"))+
+   # coord_cartesian(ylim=(c(y_minimum, y_maximum*1.2)))+##Added limits
+    coord_cartesian(expand = FALSE, #turn off axis expansion (padding)
+                    xlim = c(2001, 2019), ylim = c(y_minimum, y_maximum*1.2))+ #manually set limits
+    # sets the x-axis scale
+    ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), max(graph$year), by = 2), 1),
+                                expand = c(0, 0)) +#Added blanck ticks to x-axis
+    
+    ggplot2::theme(legend.position = "none")+
+    ggplot2::theme(text = element_text(family = paste(font), size = 9))+ 
+    ##Adding Gridlines
+    ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
+                           paste(palette_reason$SpaceGrey),"white"),size = (1)))
+}
+##Plot graph
+#debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
+#savePlot(debt.plot, source = "Source: PIP", save_filepath = "/Users/anilniraula/Downloads/test.png",
+#width_pixels = 600, height_pixels = 400)
+#With Title, caption and grid
+#debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
+
+debt <- debtPlot(PERSI.debt, caption = F, grid = F, ticks = F,font = "Calibri")
+
+debt
+```
+
+### A History of Investment Returns (2001-2019) w/ R Code
+```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
 ## Base: linePlot() function in `pensionviewr`
@@ -167,13 +328,13 @@ data$year <- as.numeric(data$year)
     ) +
     
     labs(x = element_blank(), y = labelY)+
-    theme(legend.text=element_text(size=14))+ #Added element to control legend font size
+    theme(legend.text=element_text(size=13))+ #Added element to control legend font size
     theme(legend.direction = "vertical", #changing legend direction to "vertical"
                 legend.box = "horizontal",
-                legend.position= c(0.42, 0.13)) #Moved legend to the bottom
+                legend.position= c(0.33, 0.09)) #Moved legend to the bottom
 }
 
-graph <- linePlot(PERSI.data, yaxisMin = -27, yaxisMax = 21, yaxisSeq = 3,
+graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
@@ -190,14 +351,15 @@ graph <- linePlot(PERSI.data, yaxisMin = -27, yaxisMax = 21, yaxisSeq = 3,
 
 graph
 ```
-  
-## A History of Weakening Solvency (1995-2019) w/ Saved Img
-![](graphs/Inv.Returns.PERSI.jpeg)
-## A Mountain fo Debt Plot w/ Saved Img
+
+### A Mountain fo Debt Plot w/ Saved Img
 ![](PERSI.debptPlot2.jpeg)
 
-## Slide with Bullets
+### A History of Weakening Solvency (2001-2019) w/ Saved Img
+![](graphs/Inv.Returns.PERSI.jpeg)
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+### References
+
+- https://github.com/ReasonFoundation/GraphicsR </p>
+- https://rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf </p>
+- https://bookdown.org/yihui/rmarkdown/
