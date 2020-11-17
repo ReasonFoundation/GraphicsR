@@ -50,7 +50,7 @@ data_perc[is.na(data_perc)] = 0
 
 #check if the mode of each column in the dataframe is numeric 
 sapply(data_perc, mode)
-View(data_perc)
+#View(data_perc)
 # theme plot parameters
 plotTheme <- ggplot2::theme(   
   panel.grid.major = element_blank(),
@@ -73,7 +73,7 @@ ymax <- ceiling(max(data_perc[, c(2)]+data_perc[, c(4)]))
 ymin <- ceiling(min(x2[, c(3)]))
 # added inside the scale_y_continuous the limits=c(ymin, ymax) to control the y limits
 graph <- ggplot() + 
-  scale_x_continuous(name="year", breaks = seq(min(data_perc$X1), max(data_perc$X1), by = 2)) + 
+  scale_x_continuous(name="year", breaks = seq(min(data_perc$Year), max(data_perc$Year), by = 2)) + 
   scale_y_continuous(
     breaks = scales::pretty_breaks(n = 5), 
     name="(Millions)",
