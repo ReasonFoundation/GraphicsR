@@ -345,8 +345,8 @@ graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
 #PERSI.data <- PERSI.data %>% select(year, ava, aal)
 #graph <- linePlot(PERSI.data, yaxisMin = 0, yaxisMax = 21, yaxisSeq = 3,
 #                  yaxisScale = 1/1000000000, format = "$", str = 60,
-#                  labelY = "AVA va. AAL", lab1 = "Actuarial Valued of Assets", 
-#                  lab2 = "Actuarially Accrued Liabilities")
+#                  labelY = "AVA vs. AAL", lab1 = "Actuarial Value of Assets", 
+#                  lab2 = "Actuarial Accrued Liabilities")
 
 
 graph

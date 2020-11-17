@@ -4,8 +4,8 @@
 
 ### Clean Global Environment ###
 rm(list = ls())
-
 #devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+
 ### Load Packages ###
 #install.packages('devtools')
 #library(devtools)
@@ -28,6 +28,56 @@ library(DT)
 library(plotly)
 library(plyr)
 library(dplyr)
+
+####
+
+
+
+library(reasontheme)
+library(pensionviewr)
+library(ggplot2)
+library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
+library(ggplot2)
+
+#reason_color_pal()
+#library(extrafont)
+#font_import(pattern="Roboto")
+#loadfonts(device = "win", quiet = TRUE)
+##Palette
+#https://www.rapidtables.com/web/color/Web_Safe.html
+#https://www.colorbook.io/hexcolors/view/A69FA1
+
+#rgb1 <- col2rgb(palette_reason$Yellow)/255
+#rownames(rgb1) <- c("red", "green", "blue")
+#rgb1
+#Custom color code
+#ColorName <- rgb(0.2,0.2,0.4)
+#ColorName  
+
+###
+##Pull PERSI data
+##Load list of plans
+pl <- planList()
+
+#PULL DATA
+#Data <- pullStateData(2001)
+#Data <- filterData(Data,2001)
+#Data <- data.table(Data)
+#Data <- Data %>% select(year, plan_name, state, mva, type_of_employees_covered)
+#Data <- Data %>% filter(year > 2015)
+#View(Data)
+#Data$mva <- Data[,median(na.omit(mva)), by = list(year, type_of_employees_covered)]
+
+#ggplot(data = Data) +``
+#  geom_point(aes(x = year, y = mva)) +
+#  facet_wrap(~type_of_employees_covered, nrow = 2)
+
 
 ### Arkansas Data ###
 # Original
