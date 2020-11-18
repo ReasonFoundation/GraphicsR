@@ -38,7 +38,7 @@ library(purrr)
 ###################
 #Using 2 New Functions to download and filter datat from datatabase
 reason.data <- pullStateData(2001)
-reason.data <- filterData(PERSI.data, 2001)
+reason.data <- filterData(reason.data, 2001)
 
 pl <- planList()
 #filter for PERSI
