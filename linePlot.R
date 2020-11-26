@@ -37,8 +37,13 @@ library(plyr)
 
 ###################
 #Using 2 New Functions to download and filter datat from datatabase
+<<<<<<< HEAD
 PERSI.data <- pullStateData(2001)
 PERSI.data <- filterData(PERSI.data, 2001)
+=======
+reason.data <- pullStateData(2001)
+reason.data <- filterData(reason.data, 2001)
+>>>>>>> 6a733d618b94f683b4f30eb4ed40b46014fc4890
 
 pl <- planList()
 #filter for PERSI
