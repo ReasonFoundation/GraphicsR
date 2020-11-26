@@ -220,9 +220,7 @@ PERSI.data <- PERSI.data[, ava_return := ava_returns]
 PERSI.data$year <- as.numeric(PERSI.data$year)
 
 PERSI.data <- data.frame(PERSI.data)
-
 PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
-
 
 #####Modified linePlot
 

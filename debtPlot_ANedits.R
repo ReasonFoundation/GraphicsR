@@ -2,7 +2,7 @@
 
 ##############
 #HELLO!!!
-  
+palette_reason
 rm(list=ls())
 ###Load/install packages
 #R.Version()
@@ -22,6 +22,8 @@ library(readr)
 library(rsconnect)
 library(dplyr)
 library(plyr)
+
+palette_reason$Orange
 
 #reason_color_pal()
 #library(extrafont)
