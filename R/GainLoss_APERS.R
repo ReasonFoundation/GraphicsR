@@ -175,13 +175,13 @@ server <- function(input, output, session){
   output$plot_waterfall <- plotly::renderPlotly({
     
     y <- gain_loss()
-    x = list("Underperforming<br>Investments",
-            "Benefit<br>Changes<br> & Other",
-            "Changes in<br>Methods /<br>Assumptions",
-            "Negative<br>Amortization",
-            "Actual<br>Demographic<br>Performance<br>Better Than<br>Expected",
-            "Gains From<br>Expected<br>Pay<br>Increases<br>Not Given",
-            "Net Change to<br>Unfunded<br>Liability")
+    x = list(paste0("<b>", "Investment<br>Returns","</b>"),
+             paste0("<b>", "Benefit<br>Changes<br> & Other","</b>"),
+                    paste0("<b>", "Changes to<br>Actuarial<br>Methods &<br>Assumptions","</b>"),
+                           paste0("<b>", "Negative<br>Amortization","</b>"),
+                                  paste0("<b>", "Deviations from<br>Demographic<br>Assumptions","</b>"),
+                                         paste0("<b>", "Gains From<br>Pay Increases<br>Not Given","</b>"),
+                                                paste0("<b>", "Net Change to<br>Unfunded<br>Liability","</b>"))
     
     measure= c("relative",
                "relative",
