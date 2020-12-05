@@ -37,13 +37,11 @@ library(plyr)
 
 ###################
 #Using 2 New Functions to download and filter datat from datatabase
-<<<<<<< HEAD
+
 PERSI.data <- pullStateData(2001)
 PERSI.data <- filterData(PERSI.data, 2001)
-=======
 reason.data <- pullStateData(2001)
 reason.data <- filterData(reason.data, 2001)
->>>>>>> 6a733d618b94f683b4f30eb4ed40b46014fc4890
 
 pl <- planList()
 #filter for PERSI
@@ -72,6 +70,7 @@ PERSI.data <- data.frame(PERSI.data)
 PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
 
 #####Modified linePlot
+############
 
 linePlot <- function(data, yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5,
                      yaxisScale = 100, format = NULL, str = 20,
@@ -139,7 +138,7 @@ linePlot <- function(data, yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5,
         }else if(format == "$"){#Adding "$" format
           paste0("$", round(b, 0))
         }else{
-          paste0(round(b, 0))}
+          paste0(format, round(b, 0))}
       },
       expand = c(0, 0)
     ) +
@@ -161,6 +160,8 @@ graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
                   lab3 = "Assumed Rate of Return", 
                   lab4 = "10-Year Geometric Rolling Average", lab5 = NULL)
+  
+# graph + theme(legend.position= c(0.6, 0.09))
 
 #Example w/ AVA vs. AAL
 #PERSI.data <- PERSI.data %>% select(year, ava, aal)
