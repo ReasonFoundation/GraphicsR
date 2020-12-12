@@ -3,9 +3,9 @@ title: "SamplePPT (PERSI graphs)"
 author: "Anil, Swaroop & Jen"
 date: "11/12/2020"
 font-family: 'Arial'
-output:
-  powerpoint_presentation: default
-  reference_doc: "template-no-title.pptx"
+output: 
+  powerpoint_presentation:
+    reference_doc: template_III.pptx
 ---
 
 ```{r setup, include=FALSE}
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-### A History of Weakening Solvency (2001-2019) w/ R Code
+### A History of Weakening Solvency (2001-2019) w/ R (debtPlot())
 ```{r debt, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 rm(list=ls())
@@ -79,41 +79,52 @@ set_reason_theme(style = "slide")
 
 ####Edit detPlot() manually
 ############
-debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, font) {
+debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, sp500 = FALSE, font) {
+
+  if(isTRUE(sp500)) {
+   urlfile2="https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/S%26P500.csv"
+  SP500 <- read_csv(url(urlfile2), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
+  SP500 <- SP500 %>% filter(year >= min(data$year))
+  data <- cbind(data, SP500[,2])
+  
+  graph <-
+    data.frame(data %>% select(year, SP500 = sp_500, funded_ratio) %>%
+    tidyr::drop_na())
+  
+  } else {
   
   data <- data %>%
     dplyr::filter(data$uaal != 0)
   # extrapolate between years linearly
   extrapo <- stats::approx(data$year, data$uaal,  n = 10000)
   extrapo2 <- stats::approx(data$year, data$funded_ratio, n = 10000)
-  graph <-
-    data.frame(year = extrapo$x,
-               uaal = extrapo$y,
-               funded_ratio = extrapo2$y) %>%
+  graph <- data.frame(year = extrapo$x,
+                      uaal = extrapo$y,
+              funded_ratio = extrapo2$y) %>%
     tidyr::drop_na()
   graph <- graph %>%
     dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 0 ~ "positive",
                                           .data$uaal < 0 ~ "negative"))
+  }
   
-  y_minimum <- min(graph$uaal)
-  y_maximum <- max(graph$uaal)
-  ggplot2::ggplot(graph,
-                  ggplot2::aes(x = graph$year)) +
-    ggplot2::geom_area(ggplot2::aes(y = graph$uaal, fill = graph$sign)) +#Removed "color" parameter
+  graph$funded_ratio <- as.numeric(graph$funded_ratio)
+  if(!isTRUE(sp500)){graph$uaal <- as.numeric(graph$uaal)}
+  y_minimum <- as.numeric(min(if(!isTRUE(sp500)){graph$uaal}else{graph$SP500}))
+  y_maximum <- as.numeric(max(if(!isTRUE(sp500)){graph$uaal}else{graph$SP500}))
+
+  ggplot2::ggplot(graph,ggplot2::aes(x = graph$year)) +
+    ggplot2::geom_area(ggplot2::aes(y = if(!isTRUE(sp500)){graph$uaal}else{graph$SP500}, fill = if(!isTRUE(sp500))   {graph$sign}else{palette_reason$Orange})) +#Removed "color" parameter
     ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * (y_maximum)),
                        color = palette_reason$GreyBlue,#Referenced Color Palette
                        size = 1.5) +#Increased Size 1.
     #ggtitle(title)+
     # axis labels
-    ggplot2::labs(y = "Unfunded Accrued Actuarial Liabilities (Millions)", x = NULL) +
+    ggplot2::labs(y = if(!isTRUE(sp500)) {"Unfunded Accrued Actuarial Liabilities (Millions)"}else{"S&P500 Index"}, x = NULL) +
     
     # colors assigned to pos, neg
-    ggplot2::scale_fill_manual(
-      values = c("negative" = paste(palette_reason$Green),#Referenced Color Palette
-                 "positive" = paste(palette_reason$Red)),#Referenced Color Palette
-      aesthetics = c("colour", "fill")
-    ) +
-    # sets the y-axis scale
+        ggplot2::scale_fill_manual(
+        values = c("negative" = paste(palette_reason$Green),#Referenced Color Palette
+                   "positive" = paste(palette_reason$Red)))+    # sets the y-axis scale
     ggplot2::scale_y_continuous(
       # creates 10 break points for labels
       breaks = scales::pretty_breaks(n = 10),
@@ -159,7 +170,8 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
     ggplot2::theme(text = element_text(family = paste(font), size = 9))+ 
     ##Adding Gridlines
     ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
-                           paste(palette_reason$SpaceGrey),"white"),size = (1)))
+                           paste(palette_reason$SpaceGrey),"white"),size = (1))) 
+   
 }
 ##Plot graph
 #debt.plot  <- debtPlot(PERSI.debt,font = "Calibri")
@@ -168,12 +180,12 @@ debtPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, ticks = 
 #With Title, caption and grid
 #debtPlot(PERSI.debt, "Idaho PERS Pension Debt", caption = TRUE, grid = TRUE, ticks = TRUE, font = "Verdana")
 
-debt <- debtPlot(PERSI.debt, caption = F, grid = F, ticks = F,font = "Calibri")
+debt <- debtPlot(PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
 
 debt
 ```
 
-### A History of Investment Returns (2001-2019) w/ R Code
+### A History of Investment Returns (2001-2019) w/ R (linePlot())
 ```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
@@ -324,7 +336,7 @@ graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
 graph
 ```
 
-### Asset Allocation w/ R Code
+### Asset Allocation w/ R (custom)
 ```{r assets, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),
@@ -362,7 +374,7 @@ assets <- ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill = varia
 assets
 ```
 
-### Negative Amortization Growth w/ R Code
+### Negative Amortization Growth w/ R (custom)
 ```{r neg.amo, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 rm(list=ls())
@@ -463,10 +475,10 @@ neg.amo
 #ggsave(filesave)
 ```
 
-### A Mountain fo Debt Plot w/ Saved Img
+### A Mountain fo Debt Plot w/ R (Saved Img)
 ![](PERSI.debptPlot2.jpeg)
 
-### A History of Weakening Solvency (2001-2019) w/ Saved Img
+### A History of Weakening Solvency (2001-2019) w/ R (Saved Img)
 ![](graphs/Inv.Returns.PERSI.jpeg)
 
 ### References
