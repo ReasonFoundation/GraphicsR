@@ -1,2 +1,2 @@
-This folder should contain R and Rmarkdown code that assist in creating ppt decks in R.
-Main source would be `pensionviewr` embedded functions (e.g. linePlot, debtPlot) and remarkdown ppt template.
+This folder contains R and Rmarkdown code that assists in testing & automating ppt pension decks.
+Main source would be `pensionviewr` pachage functions (e.g. linePlot, debtPlot) and remarkdown ppt template.
