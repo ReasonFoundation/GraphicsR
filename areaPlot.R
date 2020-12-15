@@ -18,21 +18,6 @@ library(rsconnect)
 library(dplyr)
 library(plyr)
 
-#reason_color_pal()
-#library(extrafont)
-#font_import(pattern="Roboto")
-#loadfonts(device = "win", quiet = TRUE)
-##Palette
-#https://www.rapidtables.com/web/color/Web_Safe.html
-#https://www.colorbook.io/hexcolors/view/A69FA1
-
-#rgb1 <- col2rgb(palette_reason$Yellow)/255
-#rownames(rgb1) <- c("red", "green", "blue")
-#rgb1
-#Custom color code
-#ColorName <- rgb(0.2,0.2,0.4)
-#ColorName  
-
 ###
 ##Pull PERSI data
 ##Load list of plans
@@ -48,6 +33,7 @@ PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
 PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
 #Set to data.frame for visualization
 PERSI.debt <- data.table(PERSI.debt)
+#Create ual column
 PERSI.debt[,uaal := aal-ava]
 ###########
 #set reasontheme
