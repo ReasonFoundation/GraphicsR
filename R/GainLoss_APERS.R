@@ -176,12 +176,12 @@ server <- function(input, output, session){
     
     y <- gain_loss()
     x = list(paste0("<b>", "Investment<br>Returns","</b>"),
-             paste0("<b>", "Benefit<br>Changes<br> & Other","</b>"),
+                paste0("<b>", "Benefit<br>Changes<br> & Other","</b>"),
                     paste0("<b>", "Changes to<br>Actuarial<br>Methods &<br>Assumptions","</b>"),
-                           paste0("<b>", "Negative<br>Amortization","</b>"),
-                                  paste0("<b>", "Deviations from<br>Demographic<br>Assumptions","</b>"),
-                                         paste0("<b>", "Gains From<br>Pay Increases<br>Not Given","</b>"),
-                                                paste0("<b>", "Net Change to<br>Unfunded<br>Liability","</b>"))
+                        paste0("<b>", "Negative<br>Amortization","</b>"),
+                            paste0("<b>", "Deviations from<br>Demographic<br>Assumptions","</b>"),
+                                paste0("<b>", "Gains From<br>Pay Increases<br>Not Given","</b>"),
+                                    paste0("<b>", "Net Change to<br>Unfunded<br>Liability","</b>"))
     
     measure= c("relative",
                "relative",
@@ -223,7 +223,7 @@ server <- function(input, output, session){
              autosize = T,
              showlegend = F) %>% 
       layout(annotations = list(yref = 'paper', xref = "x", showarrow = F, 
-                    y = 0, x = 4.5, text = "reason.org/pensions",
+                    y = 0.05, x = 4.5, text = "reason.org/pensions",
                     xanchor='right', yanchor='auto', xshift=0, yshift=0,
                     font=list(size=9, color="black")))
     

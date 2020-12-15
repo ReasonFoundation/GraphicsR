@@ -18,7 +18,6 @@ fig <- plot_ly( data,
                 textposition = "outside",
                 y= ~y,
                 text = "",
-                
                 hoverinfo = 'text',
                 hovertemplate = paste('%{y:$,.0f}<extra></extra>'),
                 decreasing = list(marker = list(color = "#70AD47")),
