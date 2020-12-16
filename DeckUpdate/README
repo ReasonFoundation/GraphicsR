@@ -1,2 +1,12 @@
-This folder contains R and Rmarkdown code that assists in testing & automating ppt pension decks.
-Main source would be `pensionviewr` pachage functions (e.g. linePlot, debtPlot) and remarkdown ppt template.
+This folder contains R and Rmarkdown code.
+Purpose: testing out & automating ppt pension decks.
+
+Main sources would be `pensionviewr` pachage functions (e.g. linePlot, debtPlot):
+- areaPlot() to create Mountain of debt + S&P500 graphs
+- linePlot() to create Investment returns, and Treasury vs. ARR graphs
+- glPlot() to create G/L waterfall chart
+- barPlot() to create negative amortization and insufficient contribution graphs
+
+and remarkdown ppt template;
+- Background image/colors
+- Position of titles, graphs, and headers
