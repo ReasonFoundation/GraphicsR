@@ -1,0 +1,38 @@
+---
+title: "PPT Deck Theme"
+author: "Anil"
+date: "12/16/2020"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This folder contains R and Rmarkdown code that assists in testing & automating ppt pension decks.
+Main source would be `pensionviewr` pachage functions (e.g. linePlot, debtPlot) and remarkdown ppt template.
+
+##Main functions:
+- areaPlot() to create Mountain of debt + S&P500 graphs
+- linePlot() to create Investment returns, and Treasury vs. ARR graphs
+- glPlot() to create G/L waterfall chart
+- barPlot() to create negative amortization and insufficient contribution graphs
+
+##PPT template
+- Background image/colors
+- Position of titles, graphs, and headers
+
+## Latest Mountain of Debt Plot using deptPlot() from `pensionviewr`
+### Modified colors, ending ticks & year labels
+  ![Latest Modified Debt Plot - PERSI](PERSI.debptPlot2.jpeg)
+  ## Modified linePlot() from `pensionviewr`(added variables, color palette, and moved legends)
+  ![Updated Inv.returns Graph - PERSI](graphs/Inv.Returns.PERSI.png)
+  
+```{r, echo=FALSE}
+```
