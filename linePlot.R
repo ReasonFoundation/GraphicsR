@@ -58,10 +58,15 @@ PERSI.data <- PERSI.data[, ava_return := ava_returns]
 PERSI.data$year <- as.numeric(PERSI.data$year)
 PERSI.data <- data.frame(PERSI.data)
 PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
+
+PERSI.data <- data.frame(PERSI.data)
+
+data <- PERSI.data
+
 #View(PERSI.data)
 #install.packages(c("httr", "jsonlite"))
 #devtools::install_github("ropensci/plotly")
- 
+
 graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
@@ -70,11 +75,12 @@ graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   lab4 = "10-Year Geometric Rolling Average")
 graph
     
-
 linePlot <- function (data, yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, 
                       yaxisScale = 100, format = NULL, str = 20, labelY = NULL, 
                       lab1 = NULL, lab2 = NULL, lab3 = NULL, lab4 = NULL, lab5 = NULL) 
 {
+  
+  data <- data.table(data)
   reasontheme::set_reason_theme(style = "slide")
   geomean <- function(x) {
     x <- as.vector(na.omit(x))
