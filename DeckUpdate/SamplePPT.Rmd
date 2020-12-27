@@ -19,6 +19,17 @@ knitr::opts_chunk$set(
 )
 ```
 
+### About the Pension Integrity Project
+
+We offer pro-bono technical assistance to public officials to help them design and implement pension reforms that improve plan solvency and promote retirement security, including: </p>
+- Customized analysis of pension system design, trends </p>
+- Independent actuarial modeling of reform scenarios </p>
+- Consultation and modeling around custom policy designs </p>
+- Latest pension reform research and case studies </p>
+- Peer-to-peer mentoring from state and local officials who have successfully enacted pension </p> reforms
+- Assistance with stakeholder outreach, engagement and relationship management </p>
+- Design and execution of public education programs and media campaigns </p>
+
 ### A History of Weakening Solvency (2001-2019) w/ R (areaPlot())
 ```{r debt, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
@@ -50,6 +61,8 @@ pl <- planList()
 #PULL DATA
 Data <- pullStateData(2001)
 Data <- filterData(Data,2001)
+Data <- Data %>% filter(year < 2020)
+
 #View(Data)
 PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
 PERSI.debt$year <- as.numeric(PERSI.debt$year)
@@ -215,6 +228,40 @@ graph
 
 ### S&P500 vs. Funded Ratio (2001-2019) w/ R (areaPlot())
 ```{r sp500, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+rm(list=ls())
+###Load/install packages
+#R.Version()
+#https://github.com/ReasonFoundation/pensionviewr
+#Create token -> usethis::edit_r_environ() -> restart -> Sys.getenv("GITHUB_PAT")
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
+library(reasontheme)
+library(pensionviewr)
+library(ggplot2)
+library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
+
+###
+##Pull PERSI data
+##Load list of plans
+pl <- planList()
+
+#PULL DATA
+Data <- pullStateData(2001)
+Data <- filterData(Data,2001)
+Data <- Data %>% filter(year < 2020)
+
+PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
+PERSI.debt$year <- as.numeric(PERSI.debt$year)
+PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
+PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
 
 sp500 <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = T, font = "Calibri")
 
