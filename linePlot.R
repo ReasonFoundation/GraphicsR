@@ -49,23 +49,22 @@ PERSI.data <- data.frame(PERSI.data)
 ###############
 #Adding AVA returns (Arkansas ERS example*)
 ava_returns <- matrix(0, 20,1)
-ava_returns[,1] <- c(-0.064, -0.0736, 0.0332, 0.1763, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50,NA)
+ava_returns[,1] <- c(-0.064, -0.0736, 0.0332, 0.1763, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50, 3.5)
 #View(ava_returns)
-ava_returns <- ava_returns/100
+ava_returns <- data.table(ava_returns/100)
 
 PERSI.data <- data.table(PERSI.data)
-PERSI.data$ava_return <- ava_returns
+PERSI.data <- PERSI.data[, ava_return := ava_returns]
 PERSI.data$year <- as.numeric(PERSI.data$year)
-PERSI.data <- data.frame(PERSI.data)
 PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
 
-PERSI.data <- data.frame(PERSI.data)
+PERSI.data <- data.table(PERSI.data)
 
 #View(PERSI.data)
 #install.packages(c("httr", "jsonlite"))
 #devtools::install_github("ropensci/plotly")
 
-graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
+graph <- linePlot(PERSI.data, title = "", font = "Calibri", yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 

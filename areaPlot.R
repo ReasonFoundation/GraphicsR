@@ -31,6 +31,11 @@ PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement Sys
 PERSI.debt$year <- as.numeric(PERSI.debt$year)
 PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
 PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
+
+graph <- areaPlot(data, title = NULL, caption = FALSE, grid = FALSE, ticks = TRUE, sp500 = FALSE, font) {
+  
+
+
 #Set to data.frame for visualization
 PERSI.debt <- data.table(PERSI.debt)
 #Create ual column
