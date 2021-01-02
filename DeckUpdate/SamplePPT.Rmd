@@ -2,10 +2,11 @@
 title: "SamplePPT (PERSI graphs)"
 author: "Anil, Swaroop, Jen & Jordan"
 date: "12/12/2020"
-font-family: 'Arial'
-output: 
+output:
   powerpoint_presentation:
     reference_doc: template_deck.pptx
+  beamer_presentation: default
+font-family: Arial
 ---
 
 ```{r setup, include=FALSE}
@@ -78,7 +79,7 @@ debt <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font 
 debt
 ```
 
-### A History of Investment Returns (2001-2019) w/ R (linePlot())
+### A History of Investment Returns (2001-2020) w/ R (linePlot())
 ```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
@@ -100,163 +101,49 @@ debt
 #Using 2 New Functions to download and filter datat from datatabase
 PERSI.data <- pullStateData(2001)
 PERSI.data <- filterData(PERSI.data, 2001)
-
-pl <- planList()
-#filter for PERSI
 PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
 #View(PERSI.data)
-
 PERSI.data$year <- as.numeric(PERSI.data$year)
 #Set to data.frame for visualization
 PERSI.data <- data.frame(PERSI.data)
 #View(PERSI.data)
-
 # UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
 ###############
 #Adding AVA returns (Arkansas ERS example*)
-ava_returns <- matrix(0, 19,1)
-ava_returns[,1] <- c(-0.064, -0.0736, 0.0332, 0.1763, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50)
+ava_returns <- matrix(0, 20,1)
+ava_returns[,1] <- c(-0.064, -0.0736, 0.0332, 0.1763, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50, 3.5)
 #View(ava_returns)
 ava_returns <- data.table(ava_returns/100)
 
 PERSI.data <- data.table(PERSI.data)
 PERSI.data <- PERSI.data[, ava_return := ava_returns]
-
 PERSI.data$year <- as.numeric(PERSI.data$year)
-
-PERSI.data <- data.frame(PERSI.data)
-PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
+PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr, dr)
+PERSI.data$year <- as.numeric(PERSI.data$year)
 
 #####Modified linePlot
 
-linePlot <- function (data, title = NULL, caption = FALSE, grid = FALSE, 
-                      treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = NULL,
-                      yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, 
-                      yaxisScale = 100, format = NULL, str = 20, labelY = NULL, 
-                      lab1 = NULL, lab2 = NULL, lab3 = NULL, lab4 = NULL, lab5 = NULL) 
-{
-  reasontheme::set_reason_theme(style = "slide")
-   x <- length(data$year)
-   data <- data.frame(data) %>% dplyr::mutate_all(dplyr::funs(as.numeric))
-  
-   ###TREASURY
-  
-   if(isTRUE(treasury)){
-   urlfile <- "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/treasury.csv"
-treasury <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
-treasury <- data.table(
-  treasury %>% filter(year >= min(data$year)))
-data <- data %>% select(year, dr)
-
-  data <- data.table(data)
-  data <- cbind(data, treasury[,2])
-  data <- data.frame(data) %>% dplyr::mutate_all(dplyr::funs(as.numeric))
-data <- data.table(data)
-data[,alt.discount := NA]
-diff <- (data[year == min(data$year)]$dr - data[year == min(data$year)]$`X30.treasury`)
-data$alt.discount <- data$`X30.treasury` + diff
-  }
-  
-     #Geomean function
-  geomean <- function(x) {
-    x <- as.vector(na.omit(x))
-    x <- x + 1
-    exp(mean(log(x))) - 1
-  }
-  
-  if (isTRUE(inv.returns)) {
-    data$return_1yr <- as.numeric(data$return_1yr)
-    returns <- as.numeric(data$return_1yr)
-    nyear <- 10
-    rolling <- geomean(returns[1:nyear])
-    n <- length(na.omit(returns)) - nyear
-    for (i in 1:n) {
-      rolling <- rbind(rolling, geomean(returns[(i + 1):(i + nyear)]))
-    }
-    data <- data.table(data)
-    rolling <- data.table(rolling)
-    data <- data.table(rbind.fill(rolling, data))
-    data[(x + 1):(x + rolling[, .N])]$V1 <- data[(1:rolling[, .N])]$V1
-    data <- data.table(data)
-    data <- data[!(1:rolling[, .N])]
-    data <- data %>% select(year, return_1yr, ava_return, 
-                            arr, V1)
-  }
-  
-  colnames(data) <- c("year", if (!is_null(lab1)) {
-    paste(lab1)
-  }, if (!is_null(lab2)) {
-    paste(lab2)
-  }, if (!is_null(lab3)) {
-    paste(lab3)
-  }, if (!is_null(lab4)) {
-    paste(lab4)
-  }, if (!is_null(lab5)) {
-    paste(lab5)
-  })
-  
-  graph <- data.table(melt(data, id.vars = "year"))
-  
-  lineColors <- c(palette_reason$Orange, palette_reason$Yellow, 
-                  palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
-  options(repr.plot.width = 1, repr.plot.height = 0.75)
-  ggplot2::ggplot(graph, ggplot2::aes(x = year, y = yaxisScale * 
-                                        value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
-                                                                                                                      str)), size = 1.5) + ggplot2::geom_hline(yintercept = 0, 
-                                                                                                                                                               color = "black") + ggplot2::scale_colour_manual(values = lineColors) + 
-    ggplot2::scale_y_continuous(breaks = seq(yaxisMin, if (!is.null(yaxisMax)) {
-      yaxisMax
-    }
-    else {
-      max(graph$value) * yaxisScale * 1.2
-    }, by = yaxisSeq), limits = c(yaxisMin, if (!is.null(yaxisMax)) {
-      yaxisMax
-    } else {
-      max(graph$value) * yaxisScale * 1.2
-    }), labels = function(b) {
-      if (format == "%") {
-        paste0(round(b, 0), "%")
-      }
-      else if (format == "$") {
-        paste0("$", round(b, 0))
-      }
-      else {
-        paste0(format, round(b, 0))
-      }
-    }, expand = c(0, 0)) + ggplot2::scale_x_continuous(breaks = seq(min(graph$year), 
-                                                                    max(graph$year), by = 2), expand = c(0, 0)) + labs(x = element_blank(), 
-                                                                                                          y = labelY) + theme(legend.text = element_text(size = 13)) + 
-    theme(legend.direction = "vertical", legend.box = "horizontal", 
-          legend.position = if(isTRUE(treasury)){c(0.1, 0.5)}else{c(0.33, 0.09)})+
-    labs(title = paste(title), 
-         caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
-    )+
-    ggplot2::theme(axis.ticks = if(isFALSE(ticks)){ggplot2::element_blank()}else{ggplot2::element_line()}
-    )+
-    ggplot2::theme(axis.ticks.x = element_line(size = 0.5, color="black"))+
-    ggplot2::theme(axis.ticks.y = element_line(size = 0.5, color="black"))+
-    ggplot2::theme(axis.text=element_text(size=12),
-                   axis.title=element_text(size=12,face="bold"))+
-    ggplot2::theme(text = element_text(family = if(!is_null(font)){paste(font)}else{paste("Arial")}, size = 9))+ 
-    ##Adding Gridlines
-    ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
-                                                                    paste(palette_reason$SpaceGrey),"white"),size = (1))) 
-  
-  # 
-}
-      
-graph <- linePlot(PERSI.data, title = NULL, caption = FALSE, grid = FALSE, 
-                  treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = "Calibri",
-                  yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
+#Inv. Returns      
+graph <- linePlot(PERSI.data, title = "", inv.returns = TRUE, treasury = FALSE,
+                  font = "Calibri", yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
-                  lab3 = "Assumed Rate of Return", 
-                  lab4 = "10-Year Geometric Rolling Average", lab5 = NULL)
+                  lab3 = "Assumed Rate of Return", lab4 = "10-Year Geometric Rolling Average")
 
+#Alternative DR vs. 30-Year TTreasury
+#graph <- linePlot(PERSI.data, title = "", inv.returns = FALSE, treasury = TRUE,
+#                  font = "Calibri", yaxisMin = 0, yaxisMax = 9, yaxisSeq = 1,
+#                  yaxisScale = 100, format = "%", str = 60,
+#                  labelY = "", lab1 = "Actual Discount Rate", 
+#                  lab2 = "30-Year Treasury Bond Yield Rate", 
+#                  lab3 = "Alternative Discount Rate")
+#graph
 #Example w/ AVA vs. AAL
 #PERSI.data <- PERSI.data %>% select(year, ava, aal)
-#graph <- linePlot(PERSI.data, yaxisMin = 0, yaxisMax = 21, yaxisSeq = 3,
+#graph <- linePlot(PERSI.data, title = "", inv.returns = FALSE, treasury = FALSE,
+#                  font = "Calibri",
+#                  yaxisMin = 0, yaxisMax = 21, yaxisSeq = 3,
 #                  yaxisScale = 1/1000000000, format = "$", str = 60,
 #                  labelY = "AVA vs. AAL", lab1 = "Actuarial Value of Assets", 
 #                  lab2 = "Actuarial Accrued Liabilities")
@@ -307,7 +194,7 @@ sp500 <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = T, font
 sp500
 ```
 
-### Asset Allocation w/ R (custom)
+### Asset Allocation (2001-2019) w/ R (custom)
 ```{r assets, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),

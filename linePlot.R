@@ -56,20 +56,30 @@ ava_returns <- data.table(ava_returns/100)
 PERSI.data <- data.table(PERSI.data)
 PERSI.data <- PERSI.data[, ava_return := ava_returns]
 PERSI.data$year <- as.numeric(PERSI.data$year)
-PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr)
-
-PERSI.data <- data.table(PERSI.data)
+PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr, dr)
+PERSI.data$year <- as.numeric(PERSI.data$year)
 
 #View(PERSI.data)
 #install.packages(c("httr", "jsonlite"))
-#devtools::install_github("ropensci/plotly")
+#devtools::install_github("ropensci/plotly")\
 
-graph <- linePlot(PERSI.data, title = "", font = "Calibri", yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
+#Investment Returns
+
+graph <- linePlot(PERSI.data, title = "", inv.returns = TRUE, treasury = FALSE,
+                  font = "Calibri", yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
-                  lab3 = "Assumed Rate of Return", 
-                  lab4 = "10-Year Geometric Rolling Average")
+                  lab3 = "Assumed Rate of Return", lab4 = "10-Year Geometric Rolling Average")
+graph
+#Alternative DR vs. #30-Year Treasury
+
+graph <- linePlot(PERSI.data, title = "", inv.returns = FALSE, treasury = TRUE,
+                  font = "Calibri", yaxisMin = 0, yaxisMax = 9, yaxisSeq = 1,
+                  yaxisScale = 100, format = "%", str = 60,
+                  labelY = "", lab1 = "Actual Discount Rate", 
+                  lab2 = "30-Year Treasury Bond Yield Rate", 
+                  lab3 = "Alternative Discount Rate")
 graph
     
 linePlot <- function (data, yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, 
@@ -153,7 +163,7 @@ linePlot <- function (data, yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5,
 }
 
 
-graph <- linePlot(PERSI.data, yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
+graph <- linePlot(PERSI.data, yaxisMin = 0, yaxisMax = 9, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
