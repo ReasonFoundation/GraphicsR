@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
   #Header
 )
 ```
-
+ 
 ### About the Pension Integrity Project
 
 We offer pro-bono technical assistance to public officials to help them design and implement pension reforms that improve plan solvency and promote retirement security, including: </p>
@@ -78,6 +78,120 @@ debt <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font 
 
 debt
 ```
+
+### Causes of Pension Debt w/ R (custom Plotly-Image)
+```{r}
+     ########## Arkansas PERS Dashboard ##########
+##Data: Manually Collected
+##By: Anil, Jordan, Swaroop
+
+### Clean Global Environment ###
+rm(list = ls())
+
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+### Load Packages ###
+#install.packages('devtools')
+#library(devtools)
+#devtools::install_github("ReasonFoundation/reasontheme",force = TRUE)
+#devtools::install_github("ReasonFoundation/pensionviewr", force = TRUE)
+#install.packages("data.table")
+library(pensionviewr)
+library(tseries)
+library(data.table)
+library(openxlsx)
+library(readr)
+library(rsconnect)
+library(ggplot2)
+library(tidyverse)
+library(shiny)
+library(shinyWidgets)
+library(shinydashboard)
+library(htmlwidgets)
+library(DT)
+library(plotly)
+library(plyr)
+library(dplyr)
+library(orca)
+library(png)
+
+### Arkansas Data ###
+
+  urlfile="https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv"
+  APERSData <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
+  APERSData <- as.data.table(APERSData)# coverted to data.table
+  
+  #[2] Reactive expression that filters G/L per user-chosen start year
+
+    y = APERSData[,lapply(.SD,sum),.SDcols=colnames(APERSData)]*1e-6# sum values by each column
+    y = t(y[,2:8])#Saving needed columns and transposing table for graphics
+  
+  #[3] Combine gain/loss data & categories to create interactive Waterfall chart w/ plotly
+    x = list("Underperforming<br>Investments",
+            "Benefit<br>Changes<br> & Other",
+            "Changes in<br>Methods /<br>Assumptions",
+            "Negative<br>Amortization",
+            "Actual<br>Demographic<br>Performance<br>Better Than<br>Expected",
+            "Gains From<br>Expected<br>Pay<br>Increases<br>Not Given",
+            "Net Change to<br>Unfunded<br>Liability")
+    
+    measure= c("relative",
+               "relative",
+               "relative",
+               "relative",
+               "negative",
+               "negative",
+               "total")
+    
+    data <- data.frame(x = factor(x, levels = x), measure, y)
+    #View(data)
+    
+    fig <- plot_ly( data,
+                    type = "waterfall",
+                    measure = ~measure,
+                    x = ~x,
+                    textposition = "outside",
+                    y= ~y,
+                    decreasing = list(marker = list(color = palette_reason$Green)),
+                    increasing = list(marker = list(color = palette_reason$Red)),
+                    totals = list(marker = list(color = palette_reason$Orange)),
+                    connector = list(line = list(color= palette_reason$SpaceGrey, width = 1))) 
+    
+    fig <- fig %>%
+      layout(#title = paste0("<b>Causes of Arkansas ERS Pension Debt<b>"," (2001-2019)"),
+             xaxis = list(title = "",tickfont = list(size = 11, face = "bold")),
+             yaxis = list(title = "<b>Change in Unfunded Liability (in $Billions)<b>",
+                          titlefont = list(size = 12), range = c(0,5),
+                          showgrid = FALSE,
+                          tick0 = 0,
+                          dtick = 0.5,
+                          ticklen = 2,
+                          linecolor = '#636363',
+                          linewidth = 0.75),
+             barmode = 'stack',
+             autosize = T,
+             showlegend = F) %>% 
+      layout(annotations = list(yref = 'paper', xref = "x", showarrow = F, 
+                    y = 0, x = 4.5, text = "reason.org/pensions",
+                    xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                    font=list(size=9, color="black")))
+    #https://github.com/plotly/orca
+    orca(fig, "surface-plot.png")
+    #fig
+    #pen <- png::readPNG("surface-plot.png")
+    
+#plot_ly() %>%
+#  layout(
+#    images = list(
+#      source = raster2uri(as.raster(pen)),
+#      x = -1, y = -3, 
+#      sizex = 7, sizey = 7,
+#      xref = "x", yref = "y",
+#      xanchor = "left", yanchor = "bottom",
+#      sizing = "stretch"
+#    )
+#  )
+```
+![](surface-plot.png)
 
 ### A History of Investment Returns (2001-2020) w/ R (linePlot())
 ```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
