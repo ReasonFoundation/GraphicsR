@@ -79,7 +79,7 @@ debt <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font 
 debt
 ```
 
-### Causes of Pension Debt w/ R (custom Plotly-Image)
+### Causes of Pension Debt (2001-2019) w/ R (custom Plotly-Image)
 ```{r}
      ########## Arkansas PERS Dashboard ##########
 ##Data: Manually Collected
@@ -118,7 +118,7 @@ library(png)
 
   urlfile="https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv"
   APERSData <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
-  APERSData <- as.data.table(APERSData)# coverted to data.table
+  APERSData <- as.data.table(APERSData)# converted to data.table
   
   #[2] Reactive expression that filters G/L per user-chosen start year
 
@@ -126,13 +126,13 @@ library(png)
     y = t(y[,2:8])#Saving needed columns and transposing table for graphics
   
   #[3] Combine gain/loss data & categories to create interactive Waterfall chart w/ plotly
-    x = list("Underperforming<br>Investments",
-            "Benefit<br>Changes<br> & Other",
-            "Changes in<br>Methods /<br>Assumptions",
-            "Negative<br>Amortization",
-            "Actual<br>Demographic<br>Performance<br>Better Than<br>Expected",
-            "Gains From<br>Expected<br>Pay<br>Increases<br>Not Given",
-            "Net Change to<br>Unfunded<br>Liability")
+    x = list(
+    "Investment<br>Returns", "Benefit<br>Changes<br> & Other",
+      "Changes to<br>Actuarial<br>Methods &<br>Assumptions", 
+      "Negative<br>Amortization",
+      "Deviations from<br>Demographic<br>Assumptions",
+      "Gains From<br>Pay<br>Increases<br>Not Given",
+      "Net Change to<br>Unfunded<br>Liability")
     
     measure= c("relative",
                "relative",
@@ -144,6 +144,13 @@ library(png)
     
     data <- data.frame(x = factor(x, levels = x), measure, y)
     #View(data)
+      m <- list(
+      l = 50,
+      r = 0,
+      b = 0,
+      t = 50,
+      pad = 4
+      )
     
     fig <- plot_ly( data,
                     type = "waterfall",
@@ -168,17 +175,23 @@ library(png)
                           linecolor = '#636363',
                           linewidth = 0.75),
              barmode = 'stack',
-             autosize = T,
-             showlegend = F) %>% 
-      layout(annotations = list(yref = 'paper', xref = "x", showarrow = F, 
-                    y = 0, x = 4.5, text = "reason.org/pensions",
-                    xanchor='right', yanchor='auto', xshift=0, yshift=0,
-                    font=list(size=9, color="black")))
+             autosize = F, 
+             width = 700, height = 450, margin = m,
+             showlegend = F)
+      
+      #ADD caption
+      
+      #   %>%
+      #layout(annotations = list(yref = 'paper', xref = "x", showarrow = F, 
+      #              y = 0, x = 4.5, text = "reason.org/pensions",
+      #              xanchor='right', yanchor='auto', xshift=0, yshift=0,
+      #              font=list(size=9, color="black")))
+    #Save Plotly as a Static PNG on a local computer (to reference in rmarkdown later)
     #https://github.com/plotly/orca
-    orca(fig, "surface-plot.png")
+    orca(fig, "GainLoss-plot.png")
     #fig
-    #pen <- png::readPNG("surface-plot.png")
     
+#pen <- png::readPNG("surface-plot.png")
 #plot_ly() %>%
 #  layout(
 #    images = list(
@@ -191,7 +204,7 @@ library(png)
 #    )
 #  )
 ```
-![](surface-plot.png)
+![](GainLoss-plot.png)
 
 ### A History of Investment Returns (2001-2020) w/ R (linePlot())
 ```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
