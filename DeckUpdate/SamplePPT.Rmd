@@ -1,7 +1,7 @@
 ---
 title: "SamplePPT (PERSI graphs)"
 author: "Anil, Swaroop, Jen & Jordan"
-date: "12/12/2020"
+date: "01/05/2021"
 output:
   powerpoint_presentation:
     reference_doc: template_deck.pptx
@@ -73,7 +73,6 @@ PERSI.debt$year <- as.numeric(PERSI.debt$year)
 PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
 PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
 
-
 debt <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
 
 debt
@@ -115,7 +114,6 @@ library(orca)
 library(png)
 
 ### Arkansas Data ###
-
   urlfile="https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv"
   APERSData <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
   APERSData <- as.data.table(APERSData)# converted to data.table
@@ -401,6 +399,7 @@ linePlot <- function (data, title = NULL, caption = FALSE, grid = FALSE,
                       lab1 = NULL, lab2 = NULL, lab3 = NULL, lab4 = NULL, lab5 = NULL) 
 {
   reasontheme::set_reason_theme(style = "slide")
+  
    x <- length(data$year)
    data <- data.frame(data) %>% dplyr::mutate_all(dplyr::funs(as.numeric))
   
@@ -420,6 +419,8 @@ data <- data.table(data)
 data[,alt.discount := NA]
 diff <- (data[year == min(data$year)]$dr - data[year == min(data$year)]$`X30.treasury`)
 data$alt.discount <- data$`X30.treasury` + diff
+
+lineColors <- c(palette_reason$SatBlue, palette_reason$LightOrange, palette_reason$Green)
   }
   
      #Geomean function
@@ -446,6 +447,7 @@ data$alt.discount <- data$`X30.treasury` + diff
     data <- data[!(1:rolling[, .N])]
     data <- data %>% select(year, return_1yr, ava_return, 
                             arr, V1)
+    lineColors <- c(palette_reason$Orange, palette_reason$Yellow,palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
   }
   
   colnames(data) <- c("year", if (!is_null(lab1)) {
@@ -462,8 +464,6 @@ data$alt.discount <- data$`X30.treasury` + diff
   
   graph <- data.table(melt(data, id.vars = "year"))
   
-  lineColors <- c(palette_reason$Orange, palette_reason$Yellow, 
-                  palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
   options(repr.plot.width = 1, repr.plot.height = 0.75)
   ggplot2::ggplot(graph, ggplot2::aes(x = year, y = yaxisScale * 
                                         value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
