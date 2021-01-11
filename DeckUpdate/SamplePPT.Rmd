@@ -1,5 +1,5 @@
 ---
-title: "SamplePPT (PERSI graphs)"
+title: "Sample_PPT (PERSI graphs)"
 author: "Anil, Swaroop, Jen & Jordan"
 date: "01/05/2021"
 output:
@@ -21,6 +21,11 @@ knitr::opts_chunk$set(
   #Source line
   #Header
 )
+#Update linePlot() for Treasury functionality
+#Update linePlot() for shaded UAL area/line plot
+#Create glPlot() w/ function to turn "interactive" parameter TRUE/FALSE to create Plotly graph (eventually use database data)
+#Create barPlot() w/ manual ready data + database calculated Neg.Amo + interest on Debt
+#
 ```
  
 ### About the Pension Integrity Project
@@ -30,7 +35,7 @@ We offer pro-bono technical assistance to public officials to help them design a
 - Independent actuarial modeling of reform scenarios </p>
 - Consultation and modeling around custom policy designs </p>
 - Latest pension reform research and case studies </p>
-- Peer-to-peer mentoring from state and local officials who have successfully enacted pension </p> reforms
+- Peer-to-peer mentoring from state and local officials who have successfully enacted pension reforms </p> 
 - Assistance with stakeholder outreach, engagement and relationship management </p>
 - Design and execution of public education programs and media campaigns </p>
 
@@ -203,6 +208,78 @@ library(png)
 #  )
 ```
 ![](GainLoss-plot.png)
+
+### Make up of Pension Contributions w/ R (custom)
+```{r}
+rm(list=ls())
+
+library(reasontheme)
+library(pensionviewr)
+library(ggplot2)
+library(tidyverse)
+library(tseries)
+library(data.table)
+library(readr)
+library(rsconnect)
+library(dplyr)
+library(plyr)
+library(DT)
+library(scales)
+
+###
+##Pull PERSI data
+##Load list of plans
+pl <- planList()
+
+#PULL DATA
+Data <- pullStateData(2001)
+Data <- filterData(Data,2001)
+Data <- Data %>% filter(year < 2020 & year > 2018)
+
+#View(Data)
+Data <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
+#View(Data)
+plan.name <- c("PERSI")
+
+#Create table skeleton
+table <- matrix(NA,7,3)
+table[3:7,1] <- c("Total Employee", 
+               "Employer (Normal Cost)", 
+               "Employer (Debt Amortization)", 
+               "Total Employer", 
+               paste0("Total ", plan.name, " Contributions"))
+
+#Use database numbers to populate/calculate needed values
+table[2,2] <- c("% of payroll")
+table[2,3] <- c("$ Value")
+table[3,2] <- as.numeric(Data$ee_nc_pct)
+table[3,3] <- as.numeric(Data$ee_contribution)
+table[4,2] <- as.numeric(Data$total_nc_pct)-as.numeric(Data$ee_nc_pct)
+table[4,3] <- as.numeric(table[4,2]) * as.numeric(Data$payroll)
+table[5,2] <- as.numeric(Data$total_amortization_payment_pct)
+table[5,3] <- as.numeric(Data$total_amortization_payment_pct) * as.numeric(Data$payroll)
+table[6,2] <- sum(as.numeric(table[4:5,2]))
+table[6,3] <- sum(as.numeric(table[4:5,3]))
+table[7,2] <- as.numeric(Data$total_nc_pct)+as.numeric(Data$total_amortization_payment_pct)
+table[7,3] <- as.numeric(Data$total_contribution)
+
+table <- data.frame(table)
+colnames(table) <- c("Name", "Payroll", "Value")
+table$Value <- as.numeric(table$Value)
+table$Payroll <- as.numeric(table$Payroll)
+
+#Format data to %/$ for appearance
+table[,3] <- scales::dollar(table$Value)
+table[,2] <- scales::percent(table$Payroll, accuracy = 0.1)
+colnames(table) <- c("", "% of Payroll", "$ Value")
+
+#View(table)
+
+#Knit the table
+knitr::kable(
+  table, caption = 'Pension Integrity Project pension database.'
+)
+```
 
 ### A History of Investment Returns (2001-2020) w/ R (linePlot())
 ```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
