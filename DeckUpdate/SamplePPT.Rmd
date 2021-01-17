@@ -209,7 +209,8 @@ glPlot <- function(
     orca(fig, paste0(fileName))}else{fig}
 }
 
-glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv",       interactive = F,
+#Code to save Static graph
+glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv",       interactive = FALSE,
       fileName = "GainLoss.png",
       title = "<b>Causes of Arkansas ERS Pension Debt (2001-2019)<b>",
       caption = TRUE,
@@ -220,6 +221,22 @@ glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/maste
       lab5 = "Deviations from<br>Demographic<br>Assumptions",
       lab6 = "Gains From<br>Pay<br>Increases<br>Not Given",
       lab7 = "Net Change to<br>Unfunded<br>Liability")
+
+#Code to show Interactive graph
+#fig <- glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv",       interactive = TRUE,
+#      fileName = "GainLoss.png",
+#      title = "<b>Causes of Arkansas ERS Pension Debt (2001-2019)<b>",
+#      caption = TRUE,
+#      lab1 = "Investment<br>Returns", 
+#      lab2 = "Benefit<br>Changes<br> & Other",
+#      lab3 = "Changes to<br>Actuarial<br>Methods &<br>Assumptions", 
+#      lab4 = "Negative<br>Amortization",
+#      lab5 = "Deviations from<br>Demographic<br>Assumptions",
+#      lab6 = "Gains From<br>Pay<br>Increases<br>Not Given",
+#      lab7 = "Net Change to<br>Unfunded<br>Liability")
+
+#Uncomment "fig" below*
+#fig
 
 ```
 ![](GainLoss.png)
