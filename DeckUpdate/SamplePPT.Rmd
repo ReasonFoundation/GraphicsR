@@ -78,7 +78,7 @@ PERSI.debt$year <- as.numeric(PERSI.debt$year)
 PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
 PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
 
-debt <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
+debt <- areaPlot(PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
 
 debt
 ```
@@ -156,13 +156,13 @@ glPlot <- function(
     
     data <- data.frame(x = factor(x, levels = x), measure, y)
     #View(data)
-    #  m <- list(
-    #  l = 50,
-    #  r = 0,
-    #  b = 0,
-    #  t = 50,
-    #  pad = 4
-    #  )
+      m <- list(
+      l = 50,
+      r = 0,
+      b = 0,
+      t = 50,
+      pad = 4
+      )
     data <- data.frame(data)
    
     #[4] Visualizing with Plotly
@@ -174,7 +174,7 @@ glPlot <- function(
                     y= ~y,
                     decreasing = list(marker = list(color = palette_reason$Green)),
                     increasing = list(marker = list(color = palette_reason$Red)),
-                    totals = list(marker = list(color = palette_reason$Red)),
+                    totals = list(marker = list(color = palette_reason$Orange)),
                     connector = list(line = list(color= palette_reason$SpaceGrey, width = 1))) 
     
     fig <- fig %>%
@@ -190,7 +190,7 @@ glPlot <- function(
                           linewidth = 0.75),
              barmode = 'stack',
              autosize = F,
-            #width = 700, height = 450, margin = m,
+             width = 700, height = 450, margin = m,
              showlegend = F)
       
       #ADD caption
@@ -210,10 +210,11 @@ glPlot <- function(
 }
 
 #Code to save Static graph
-glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv",       interactive = FALSE,
+glPlot(url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv",       
+      interactive = FALSE,
       fileName = "GainLoss.png",
-      title = "<b>Causes of Arkansas ERS Pension Debt (2001-2019)<b>",
-      caption = TRUE,
+      title = "",#"<b>Causes of Arkansas ERS Pension Debt (2001-2019)<b>",
+      caption = FALSE,
       lab1 = "Investment<br>Returns", 
       lab2 = "Benefit<br>Changes<br> & Other",
       lab3 = "Changes to<br>Actuarial<br>Methods &<br>Assumptions", 
@@ -498,67 +499,61 @@ PERSI.data$year <- as.numeric(PERSI.data$year)
 PERSI.data <- PERSI.data %>% select(year, dr)
 #Set to data.frame for visualization
 PERSI.data <- data.frame(PERSI.data)
+PERSI.data$year <- as.numeric(PERSI.data$year)
 #View(PERSI.data)
 #####Modified linePlot
 
+
 linePlot <- function (data, title = NULL, caption = FALSE, grid = FALSE, 
-                      treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = NULL,
-                      yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, 
-                      yaxisScale = 100, format = NULL, str = 20, labelY = NULL, 
-                      lab1 = NULL, lab2 = NULL, lab3 = NULL, lab4 = NULL, lab5 = NULL) 
+  treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = NULL, 
+  yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, yaxisScale = 100, 
+  format = NULL, str = 20, labelY = NULL, lab1 = NULL, lab2 = NULL, 
+  lab3 = NULL, lab4 = NULL, lab5 = NULL) 
 {
   reasontheme::set_reason_theme(style = "slide")
-  
-   x <- length(data$year)
-   data <- data.frame(data) %>% dplyr::mutate_all(dplyr::funs(as.numeric))
-  
-   ###TREASURY
-  
-   if(isTRUE(treasury)){
-   urlfile <- "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/treasury.csv"
-treasury <- read_csv(url(urlfile), col_names = TRUE, na = c(""), skip_empty_rows = TRUE, col_types = NULL)
-treasury <- data.table(
-  treasury %>% filter(year >= min(data$year)))
-data <- data %>% select(year, dr)
-
-  data <- data.table(data)
-  data <- cbind(data, treasury[,2])
-  data <- data.frame(data) %>% dplyr::mutate_all(dplyr::funs(as.numeric))
-data <- data.table(data)
-data[,alt.discount := NA]
-diff <- (data[year == min(data$year)]$dr - data[year == min(data$year)]$`X30.treasury`)
-data$alt.discount <- data$`X30.treasury` + diff
-
-lineColors <- c(palette_reason$SatBlue, palette_reason$LightOrange, palette_reason$Green)
+  x <- length(data$year)
+  data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+  if (isTRUE(treasury)) {
+    urlfile <- "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/treasury.csv"
+    treasury <- read_csv(url(urlfile), col_names = TRUE, 
+      na = c(""), skip_empty_rows = TRUE, col_types = NULL)
+    treasury$year <- as.numeric(treasury$year)
+    data$year <- as.numeric(data$year)
+    treasury <- data.table(treasury %>% filter(year > min(data$year - 
+      1)))
+    data <- data %>% select(year, dr)
+    data <- data.table(data)
+    data <- cbind(data, treasury[, 2])
+    data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+    data <- as.data.table(data)
+    data$alt.discount <- NA
+    diff <- (data[year == min(data$year)]$dr - data[year == 
+      min(data$year)]$X30.treasury)
+    data$alt.discount <- data$X30.treasury + diff
   }
-  
-     #Geomean function
   geomean <- function(x) {
     x <- as.vector(na.omit(x))
     x <- x + 1
     exp(mean(log(x))) - 1
   }
-  
   if (isTRUE(inv.returns)) {
     data$return_1yr <- as.numeric(data$return_1yr)
-    returns <- as.numeric(data$return_1yr)
-    nyear <- 10
-    rolling <- geomean(returns[1:nyear])
-    n <- length(na.omit(returns)) - nyear
-    for (i in 1:n) {
-      rolling <- rbind(rolling, geomean(returns[(i + 1):(i + nyear)]))
+    returns <- data$return_1yr
+    last <- length(returns)
+    rolling <- matrix(NA, last, 1)
+    rolling[last] <- as.numeric(geomean(returns[(last - 
+      9):last]))
+    for (i in 1:(last - 10)) {
+      rolling[last - i] <- geomean(returns[(last - 9 - 
+        i):(last - i)])
     }
-    data <- data.table(data)
     rolling <- data.table(rolling)
-    data <- data.table(rbind.fill(rolling, data))
-    data[(x + 1):(x + rolling[, .N])]$V1 <- data[(1:rolling[, .N])]$V1
-    data <- data.table(data)
-    data <- data[!(1:rolling[, .N])]
+    returns[(last - 9):last]
+    returns[(last - 9 + 1):(last - 1)]
+    data <- data.table(cbind(data, rolling))
     data <- data %>% select(year, return_1yr, ava_return, 
-                            arr, V1)
-    lineColors <- c(palette_reason$Orange, palette_reason$Yellow,palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
+      arr, V1)
   }
-  
   colnames(data) <- c("year", if (!is_null(lab1)) {
     paste(lab1)
   }, if (!is_null(lab2)) {
@@ -570,14 +565,14 @@ lineColors <- c(palette_reason$SatBlue, palette_reason$LightOrange, palette_reas
   }, if (!is_null(lab5)) {
     paste(lab5)
   })
-  
   graph <- data.table(melt(data, id.vars = "year"))
-  
+  lineColors <- c(palette_reason$Orange, palette_reason$Yellow, 
+    palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
   options(repr.plot.width = 1, repr.plot.height = 0.75)
   ggplot2::ggplot(graph, ggplot2::aes(x = year, y = yaxisScale * 
-                                        value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
-                                                                                                                      str)), size = 1.5) + ggplot2::geom_hline(yintercept = 0, 
-                                                                                                                                                               color = "black") + ggplot2::scale_colour_manual(values = lineColors) + 
+    value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
+    str)), size = 1.5) + ggplot2::geom_hline(yintercept = 0, 
+    color = "black") + ggplot2::scale_colour_manual(values = lineColors) + 
     ggplot2::scale_y_continuous(breaks = seq(yaxisMin, if (!is.null(yaxisMax)) {
       yaxisMax
     }
@@ -598,26 +593,33 @@ lineColors <- c(palette_reason$SatBlue, palette_reason$LightOrange, palette_reas
         paste0(format, round(b, 0))
       }
     }, expand = c(0, 0)) + ggplot2::scale_x_continuous(breaks = seq(min(graph$year), 
-                                                                    max(graph$year), by = 2), expand = c(0, 0)) + labs(x = element_blank(), 
-                                                                                                          y = labelY) + theme(legend.text = element_text(size = 13)) + 
+    max(graph$year), by = 2), expand = c(0, 0)) + labs(x = element_blank(), 
+    y = labelY) + theme(legend.text = element_text(size = 13)) + 
     theme(legend.direction = "vertical", legend.box = "horizontal", 
-          legend.position = if(isTRUE(treasury)){c(0.33, 5)}else{c(0.33, 0.09)})+
-    labs(title = paste(title), 
-         caption = ifelse(isTRUE(caption),paste("reason.org/pensions"),paste(""))
-    )+
-    ggplot2::theme(axis.ticks = if(isFALSE(ticks)){ggplot2::element_blank()}else{ggplot2::element_line()}
-    )+
-    ggplot2::theme(axis.ticks.x = element_line(size = 0.5, color="black"))+
-    ggplot2::theme(axis.ticks.y = element_line(size = 0.5, color="black"))+
-    ggplot2::theme(axis.text=element_text(size=12),
-                   axis.title=element_text(size=12,face="bold"))+
-    ggplot2::theme(text = element_text(family = if(!is_null(font)){paste(font)}else{paste("Arial")}, size = 9))+ 
-    ##Adding Gridlines
-    ggplot2::theme(panel.grid.major.y = element_line(colour= ifelse(isTRUE(grid), 
-                                                                    paste(palette_reason$SpaceGrey),"white"),size = (1))) 
-  
-  # 
+      legend.position = if (isTRUE(treasury)) {
+        c(0.1, 1)
+      }
+      else {
+        c(0.33, 0.09)
+      }) + labs(title = paste(title), caption = ifelse(isTRUE(caption), 
+    paste("reason.org/pensions"), paste(""))) + ggplot2::theme(axis.ticks = if (isFALSE(ticks)) {
+    ggplot2::element_blank()
+  }
+  else {
+    ggplot2::element_line()
+  }) + ggplot2::theme(axis.ticks.x = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.ticks.y = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.text = element_text(size = 12), 
+    axis.title = element_text(size = 12, face = "bold")) + 
+    ggplot2::theme(text = element_text(family = if (!is_null(font)) {
+      paste(font)
+    }
+    else {
+      paste("Arial")
+    }, size = 9)) + ggplot2::theme(panel.grid.major.y = element_line(colour = ifelse(isTRUE(grid), 
+    paste(palette_reason$SpaceGrey), "white"), size = (1)))
 }
+
 
 treasury <- linePlot(PERSI.data, title = NULL, caption = FALSE, grid = FALSE, 
                   treasury = TRUE, inv.returns = FALSE, ticks = TRUE, font = "Calibri",
