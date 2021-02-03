@@ -1,0 +1,13 @@
+name: GainLoss_NMERB
+title: GainLoss_NMERB
+username:
+account: reason
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3519305
+bundleId: 4141457
+url: https://reason.shinyapps.io/GainLoss_NMERB/
+when: 1611598921.43842
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|areaPlot.R|Asset.Allocation.PERSI.R|debtPlot_ANedits_design.R|debtPlot_ANedits.R|debtPlot2_ANedits.R|DR Vs Treasury.R|GainLoss-plot.png|GainLoss.png|glPlot.R|Idaho Amo Data.csv|Idaho Amo Data.xlsx|Idaho Graphs&Charts.xlsx|Idaho Public Employee Retirement System (PERS)__Full.csv|Idaho_DR_Treasury.csv|Idaho_GainLoss.csv|Idaho_waterfall.R|Inv.Returns.PERSI.jpeg|Inv.Returns.PERSI.pdf|linePlot.R|Negative.Amo.R|PERSI.debptPlot2.jpeg|PERSI.debtPlot2.jpeg|PERSI.debtPlot2.png|PERSI.Excel.graph.png|PERSI.viz.R|README_DeckUpdate.Rmd|README.md|README.Rmd.R|ReasonTheme.docx|ReasonTheme.log|ReasonTheme.Rmd|ReasonTheme.tex|s_p_plot_jen_v.1.R|SampleShinyPPT.Rmd|stochastic_v.1.R|surface-plot.png|template-no-title.pptx|Untitled.R|.github/workflows/blank.yml|graphs/areaPlot_sample.png|graphs/data-visualization-2.1.pdf|graphs/DebtPlot.Orig.jpeg|graphs/Inv.Returns.PERSI.jpeg|graphs/Inv.Returns.PERSI.png|DeckUpdate|GraphicsR|R
