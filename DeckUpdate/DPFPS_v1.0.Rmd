@@ -1,6 +1,6 @@
 ---
-title: "Dallas Police and Fire Pension System"
-author: "Anil, Zachary & Jordan"
+title: "Dallas Police and Fire Pension System Pension Solvency Analysis"
+author: "Prepared by: Pension Integrity Project at Reason Foundation January 26, 2020"
 date: "02/15/2021"
 output:
   powerpoint_presentation:
@@ -39,7 +39,7 @@ We offer pro-bono technical assistance to public officials to help them design a
 - Assistance with stakeholder outreach, engagement and relationship management </p>
 - Design and execution of public education programs and media campaigns </p>
 
-### A History of Weakening Solvency (2001-2019) w/ R (areaPlot())
+### A History of Weakening Solvency (2001-2020) w/ R (areaPlot())
 ```{r debt, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 rm(list=ls())
@@ -61,6 +61,7 @@ library(readr)
 library(rsconnect)
 library(dplyr)
 library(plyr)
+library(xlsx)
 
 ###
 ##Pull PERSI data
@@ -68,23 +69,127 @@ library(plyr)
 pl <- planList()
 
 #PULL DATA
-Data <- pullStateData(2001)
-Data <- filterData(Data,2001)
-Data <- Data %>% filter(year < 2020)
 
-#View(Data)
-PERSI.debt <- data.table(Data) %>% filter(plan_name == "Idaho Public Employee Retirement System") 
+DPF.data <- pullData(pl, "Dallas Police and Fire Pension System")
+DPF.data <- filterData(DPF.data, 2001)
+#write.xlsx(DPF.data, "DPF.data.xlsx")
+#View(DPF.data)
 
-PERSI.debt$year <- as.numeric(PERSI.debt$year)
-PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
-PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
+DPF.data$year <- as.numeric(DPF.data$year)
+DPF.data$ava <- as.numeric(DPF.data$ava)
+DPF.data$aal <- as.numeric(DPF.data$aal)
 
-debt <- areaPlot(PERSI.debt, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
+areaPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, 
+  ticks = TRUE, sp500 = FALSE, font) 
+{
+  if (isTRUE(sp500)) {
+    urlfile2 = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/S%26P500.csv"
+    SP500 <- read_csv(url(urlfile2), col_names = TRUE, na = c(""), 
+      skip_empty_rows = TRUE, col_types = NULL)
+    SP500 <- SP500 %>% filter(year >= min(data$year))
+    data <- cbind(data, SP500[, 2])
+    graph <- data.frame(data %>% select(year, SP500 = sp_500, 
+      funded_ratio) %>% tidyr::drop_na())
+  }
+  else {
+    data <- as.data.table(data)
+    data$uaal <- (data$aal - data$ava)
+    data <- data %>% dplyr::filter(data$uaal != 0)
+    extrapo <- stats::approx(data$year, data$uaal, n = 10000)
+    extrapo2 <- stats::approx(data$year, data$funded_ratio, 
+      n = 10000)
+    graph <- data.frame(year = extrapo$x, uaal = extrapo$y, 
+      funded_ratio = extrapo2$y) %>% tidyr::drop_na()
+    graph <- graph %>% dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 
+      0 ~ "positive", .data$uaal < 0 ~ "negative"))
+  }
+  graph$funded_ratio <- as.numeric(graph$funded_ratio)
+  graph$year <- as.numeric(graph$year)
+  if (!isTRUE(sp500)) {
+    graph$uaal <- as.numeric(graph$uaal)
+  }
+  y_minimum <- as.numeric(min(if (!isTRUE(sp500)) {
+    graph$uaal
+  } else {
+    0
+  }))
+  y_maximum <- as.numeric(max(if (!isTRUE(sp500)) {
+    graph$uaal
+  } else {
+    graph$SP500
+  }))
+  reasontheme::set_reason_theme(style = "slide")
+  ggplot2::ggplot(graph, ggplot2::aes(x = graph$year)) + ggplot2::geom_area(ggplot2::aes(y = if (!isTRUE(sp500)) {
+    graph$uaal
+  }
+  else {
+    graph$SP500
+  }, fill = if (!isTRUE(sp500)) {
+    graph$sign
+  }
+  else {
+    palette_reason$Orange
+  })) + ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * 
+    (y_maximum)), color = palette_reason$GreyBlue, size = 1.5) + 
+    ggplot2::labs(y = if (!isTRUE(sp500)) {
+      "Unfunded Accrued Actuarial Liabilities (Millions)"
+    }
+    else {
+      "S&P500 Index"
+    }, x = NULL) + ggplot2::scale_fill_manual(values = if (!isTRUE(sp500)) {
+    c(negative = paste(palette_reason$Green), positive = paste(palette_reason$Red))
+  }
+  else {
+    c(paste(palette_reason$Yellow))
+  }) + ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n = 10), 
+    labels = scales::dollar_format(prefix = if (!isTRUE(sp500)) {
+      "$"
+    }
+    else {
+      ""
+    }, scale = if (!isTRUE(sp500)) {
+      (1e-06)
+    }
+    else {
+      1
+    }, largest_with_cents = if (!isTRUE(sp500)) {
+      1
+    }
+    else {
+      0.001
+    }),  sec.axis = ggplot2::sec_axis(~./(y_maximum/100), 
+      breaks = scales::pretty_breaks(n = 10), name = "Funded Ratio", 
+      labels = function(b) {
+        paste0(round(b, 0), "%")
+      }), expand = c(0, 0)) + geom_hline(yintercept = 0, 
+    linetype = "solid", color = "black", size = 0.5) + labs(title = paste(title), 
+    caption = ifelse(isTRUE(caption), paste("reason.org/pensions"), 
+      paste(""))) + ggplot2::theme(axis.ticks = if (isFALSE(ticks)) {
+    ggplot2::element_blank()
+  }
+  else {
+    ggplot2::element_line()
+  }) + ggplot2::theme(axis.ticks.x = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.ticks.y = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.text = element_text(size = 12), 
+    axis.title = element_text(size = 12, face = "bold")) + 
+    coord_cartesian(expand = FALSE, xlim = c(min(graph$year), 
+      max(graph$year)), ylim = c(y_minimum, y_maximum * 
+      1.2)) + ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), 
+    max(graph$year), by = 2), 1), expand = c(0, 0)) + ggplot2::theme(legend.position = "none") + 
+    ggplot2::theme(text = element_text(family = paste(font), 
+      size = 9)) + ggplot2::theme(panel.grid.major.y = element_line(colour = ifelse(isTRUE(grid), 
+    paste(palette_reason$SpaceGrey), "white"), size = (1)))
+}
+
+
+
+debt <- areaPlot(DPF.data, caption = F, grid = F, ticks = F, sp500 = F, font = "Calibri")
 
 debt
 ```
 
-### Causes of Pension Debt (2001-2019) w/ R (custom Plotly-Image)
+### Causes of Pension Debt (2001-2020) w/ R (custom Plotly-Image)
 ```{r}
      ########## Arkansas PERS Dashboard ##########
 ##Data: Manually Collected
@@ -124,7 +229,7 @@ library(png)
 glPlot <- function(
       url = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/APERS_GL.csv", 
       interactive = FALSE, fileName = "GainLoss.png",
-      title = "<b>Causes of Arkansas ERS Pension Debt (2001-2019)<b>",
+      title = "<b>Causes of Arkansas ERS Pension Debt (2001-2020)<b>",
       caption = FALSE,
       lab1 = "Investment<br>Returns", 
       lab2 = "Benefit<br>Changes<br> & Other",
@@ -335,13 +440,17 @@ knitr::kable(
 
 ###################
 #Using 2 New Functions to download and filter datat from datatabase
-PERSI.data <- pullStateData(2001)
-PERSI.data <- filterData(PERSI.data, 2001)
-PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
-#View(PERSI.data)
-PERSI.data$year <- as.numeric(PERSI.data$year)
-#Set to data.frame for visualization
-PERSI.data <- data.frame(PERSI.data)
+pl <- planList()
+
+#PULL DATA
+
+DPF.data <- pullData(pl, "Dallas Police and Fire Pension System")
+DPF.data <- filterData(DPF.data, 2001)
+#View(DPF.data)
+
+DPF.data$year <- as.numeric(DPF.data$year)
+DPF.data$ava <- as.numeric(DPF.data$ava)
+DPF.data$aal <- as.numeric(DPF.data$aal)
 #View(PERSI.data)
 # UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
 ###############
@@ -350,18 +459,21 @@ ava_returns <- matrix(0, 20,1)
 ava_returns[,1] <- c(-0.064, -0.0736, 0.0332, 0.1763, 4.70, 9.00, 12.40, 8.00, -5.90, 2.00, 3.10, 4.50, 11.40, 13.80, 8.80, 8.20, 7.70, 5.80, 6.50, 3.5)
 #View(ava_returns)
 ava_returns <- data.table(ava_returns/100)
+#View(ava_returns)
+DPF.data <- data.table(DPF.data)
+DPF.data$ava_return <- ava_returns
+DPF.data$year <- as.numeric(DPF.data$year)
+DPF.data$arr <- as.numeric(DPF.data$arr)
+DPF.data$ava_return<- as.numeric(DPF.data$ava_return)
+DPF.data$return_1yr <- as.numeric(DPF.data$return_1yr)
+DPF.data <- DPF.data %>% select(year, return_1yr, ava_return, arr, dr)
 
-PERSI.data <- data.table(PERSI.data)
-PERSI.data <- PERSI.data[, ava_return := ava_returns]
-PERSI.data$year <- as.numeric(PERSI.data$year)
-PERSI.data <- PERSI.data %>% select(year, return_1yr, ava_return, arr, dr)
-PERSI.data$year <- as.numeric(PERSI.data$year)
-
+#View(DPF.data)
 #####Modified linePlot
 
 #Inv. Returns      
-graph <- linePlot(PERSI.data, title = "", inv.returns = TRUE, treasury = FALSE,
-                  font = "Calibri", yaxisMin = -21, yaxisMax = 21, yaxisSeq = 3,
+graph <- linePlot(DPF.data, title = "", inv.returns = TRUE, treasury = FALSE,
+                  font = "Calibri", yaxisMin = -27, yaxisMax = 27, yaxisSeq = 3,
                   yaxisScale = 100, format = "%", str = 60,
                   labelY = "", lab1 = "Market Valued Returns (Actual)", 
                   lab2 = "Actuarially Valued Investment Return (Smoothed by Plan)", 
@@ -388,7 +500,7 @@ graph <- linePlot(PERSI.data, title = "", inv.returns = TRUE, treasury = FALSE,
 graph
 ```
 
-### S&P500 vs. Funded Ratio (2001-2019) w/ R (areaPlot())
+### S&P500 vs. Funded Ratio (2001-2020) w/ R (areaPlot())
 ```{r sp500, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 rm(list=ls())
 ###Load/install packages
@@ -416,21 +528,127 @@ library(plyr)
 pl <- planList()
 
 #PULL DATA
-Data <- pullStateData(2001)
-Data <- filterData(Data,2001)
-Data <- Data %>% filter(year < 2020)
 
-PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
-PERSI.debt$year <- as.numeric(PERSI.debt$year)
-PERSI.debt$ava <- as.numeric(PERSI.debt$ava)
-PERSI.debt$aal <- as.numeric(PERSI.debt$aal)
+DPF.data <- pullData(pl, "Dallas Police and Fire Pension System")
+DPF.data <- filterData(DPF.data, 2001)
 
-sp500 <- areaPlot (PERSI.debt, caption = F, grid = F, ticks = F, sp500 = T, font = "Calibri")
+#View(DPF.data)
+
+DPF.data$year <- as.numeric(DPF.data$year)
+DPF.data$ava <- as.numeric(DPF.data$ava)
+DPF.data$aal <- as.numeric(DPF.data$aal)
+
+areaPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE, 
+  ticks = TRUE, sp500 = FALSE, font) 
+{
+  if (isTRUE(sp500)) {
+    urlfile2 = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/S%26P500.csv"
+    SP500 <- read_csv(url(urlfile2), col_names = TRUE, na = c(""), 
+      skip_empty_rows = TRUE, col_types = NULL)
+    SP500 <- SP500 %>% filter(year >= min(data$year))
+    data <- cbind(data, SP500[, 2])
+    graph <- data.frame(data %>% select(year, SP500 = sp_500, 
+      funded_ratio) %>% tidyr::drop_na())
+  }
+  else {
+    data <- as.data.table(data)
+    data$uaal <- (data$aal - data$ava)
+    data <- data %>% dplyr::filter(data$uaal != 0)
+    extrapo <- stats::approx(data$year, data$uaal, n = 10000)
+    extrapo2 <- stats::approx(data$year, data$funded_ratio, 
+      n = 10000)
+    graph <- data.frame(year = extrapo$x, uaal = extrapo$y, 
+      funded_ratio = extrapo2$y) %>% tidyr::drop_na()
+    graph <- graph %>% dplyr::mutate(sign = dplyr::case_when(.data$uaal >= 
+      0 ~ "positive", .data$uaal < 0 ~ "negative"))
+  }
+  graph$funded_ratio <- as.numeric(graph$funded_ratio)
+  graph$year <- as.numeric(graph$year)
+  if (!isTRUE(sp500)) {
+    graph$uaal <- as.numeric(graph$uaal)
+  }
+  y_minimum <- as.numeric(min(if (!isTRUE(sp500)) {
+    graph$uaal
+  } else {
+    0
+  }))
+  y_maximum <- as.numeric(max(if (!isTRUE(sp500)) {
+    graph$uaal
+  } else {
+    graph$SP500
+  }))
+  reasontheme::set_reason_theme(style = "slide")
+  ggplot2::ggplot(graph, ggplot2::aes(x = graph$year)) + ggplot2::geom_area(ggplot2::aes(y = if (!isTRUE(sp500)) {
+    graph$uaal
+  }
+  else {
+    graph$SP500
+  }, fill = if (!isTRUE(sp500)) {
+    graph$sign
+  }
+  else {
+    palette_reason$Orange
+  })) + ggplot2::geom_line(ggplot2::aes(y = graph$funded_ratio * 
+    (y_maximum)), color = palette_reason$GreyBlue, size = 1.5) + 
+    ggplot2::labs(y = if (!isTRUE(sp500)) {
+      "Unfunded Accrued Actuarial Liabilities (Millions)"
+    }
+    else {
+      "S&P500 Index"
+    }, x = NULL) + ggplot2::scale_fill_manual(values = if (!isTRUE(sp500)) {
+    c(negative = paste(palette_reason$Green), positive = paste(palette_reason$Red))
+  }
+  else {
+    c(paste(palette_reason$Yellow))
+  }) + ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(n = 10), 
+    labels = scales::dollar_format(prefix = if (!isTRUE(sp500)) {
+      "$"
+    }
+    else {
+      ""
+    }, scale = if (!isTRUE(sp500)) {
+      (1e-06)
+    }
+    else {
+      1
+    }, largest_with_cents = if (!isTRUE(sp500)) {
+      1
+    }
+    else {
+      0.001
+    }),  sec.axis = ggplot2::sec_axis(~./(y_maximum/100), 
+      breaks = scales::pretty_breaks(n = 10), name = "Funded Ratio", 
+      labels = function(b) {
+        paste0(round(b, 0), "%")
+      }), expand = c(0, 0)) + geom_hline(yintercept = 0, 
+    linetype = "solid", color = "black", size = 0.5) + labs(title = paste(title), 
+    caption = ifelse(isTRUE(caption), paste("reason.org/pensions"), 
+      paste(""))) + ggplot2::theme(axis.ticks = if (isFALSE(ticks)) {
+    ggplot2::element_blank()
+  }
+  else {
+    ggplot2::element_line()
+  }) + ggplot2::theme(axis.ticks.x = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.ticks.y = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.text = element_text(size = 12), 
+    axis.title = element_text(size = 12, face = "bold")) + 
+    coord_cartesian(expand = FALSE, xlim = c(min(graph$year), 
+      max(graph$year)), ylim = c(y_minimum, y_maximum * 
+      1.2)) + ggplot2::scale_x_continuous(breaks = round(seq(min(graph$year), 
+    max(graph$year), by = 2), 1), expand = c(0, 0)) + ggplot2::theme(legend.position = "none") + 
+    ggplot2::theme(text = element_text(family = paste(font), 
+      size = 9)) + ggplot2::theme(panel.grid.major.y = element_line(colour = ifelse(isTRUE(grid), 
+    paste(palette_reason$SpaceGrey), "white"), size = (1)))
+}
+
+
+
+sp500 <- areaPlot(DPF.data, caption = F, grid = F, ticks = F, sp500 = T, font = "Calibri")
 
 sp500
 ```
 
-### Asset Allocation (2001-2019) w/ R (custom)
+### Asset Allocation (2001-2020) w/ R (custom)
 ```{r assets, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),
@@ -460,7 +678,7 @@ assets <- ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill = varia
   scale_y_continuous(labels = function(x) paste0(x*100,"%"), name = "% of Investment Portfolio",
                      breaks = seq(0, 1, by = 0.1), limits = c(0, 1), expand=c(0,0))+
   scale_x_continuous(labels = function(x) paste0(x, ""), name = "",
-                     breaks = seq(2001, 2019, by = 2), limits = c(2001, 2019), expand=c(0,0))+
+                     breaks = seq(2001, 2020, by = 2), limits = c(2001, 2020), expand=c(0,0))+
   theme_bw()+
   plotTheme+
   theme(legend.position="bottom")
@@ -468,7 +686,7 @@ assets <- ggplot(PERSI.assets) + geom_area(aes(x = year, y = value, fill = varia
 assets
 ```
 
-### Change in Risk-Free Rate vs. Discount Rate (2001-2019) w/ R (linePlot())
+### Change in Risk-Free Rate vs. Discount Rate (2001-2020) w/ R (linePlot())
 ```{r treasury, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
