@@ -39,8 +39,8 @@ We offer pro-bono technical assistance to public officials to help them design a
 - Assistance with stakeholder outreach, engagement and relationship management </p>
 - Design and execution of public education programs and media campaigns </p>
 
-### A History of Weakening Solvency (2001-2019) w/ R (areaPlot())
-```{r debt, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+### A History of Weakening Solvency (2001-2020) w/ R (areaPlot())
+```{r debt, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 rm(list=ls())
 ###Load/install packages
@@ -70,7 +70,7 @@ pl <- planList()
 #PULL DATA
 Data <- pullStateData(2001)
 Data <- filterData(Data,2001)
-Data <- Data %>% filter(year < 2020)
+Data <- Data
 
 #View(Data)
 PERSI.debt <- data.table(Data) %>% filter(plan_name == "Idaho Public Employee Retirement System") 
@@ -122,8 +122,7 @@ areaPlot <- function(data, title = NULL, caption = FALSE, grid = FALSE,
     graph$SP500
   }))
   
-  View(y_maximum)
-  View(graph)
+  
   reasontheme::set_reason_theme(style = "slide")
   ggplot2::ggplot(graph, ggplot2::aes(x = graph$year)) + ggplot2::geom_area(ggplot2::aes(y = if (!isTRUE(sp500)) {
     graph$uaal
@@ -194,7 +193,7 @@ debt
 ```
 
 ### Causes of Pension Debt (2001-2019) w/ R (custom Plotly-Image)
-```{r}
+```{r, dpi=400}
      ########## Arkansas PERS Dashboard ##########
 ##Data: Manually Collected
 ##By: Anil, Jordan, Swaroop
@@ -316,7 +315,7 @@ glPlot <- function(
     if(!isTRUE(interactive)){
     #Save Plotly as a Static PNG on a local computer (to reference in rmarkdown later)
     #https://github.com/plotly/orca
-    orca(fig, paste0(fileName))}else{fig}
+    orca(fig, paste0(fileName), width =  7 * 300, height = 4 * 300)}else{fig}
 }
 
 #Code to save Static graph
@@ -425,7 +424,7 @@ knitr::kable(
 ```
 
 ### A History of Investment Returns (2001-2020) w/ R (linePlot())
-```{r graph, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r graph, dpi = 400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
 ## Base: linePlot() function in `pensionviewr`
@@ -498,7 +497,7 @@ graph
 ```
 
 ### S&P500 vs. Funded Ratio (2001-2019) w/ R (areaPlot())
-```{r sp500, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r sp500, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 rm(list=ls())
 ###Load/install packages
 #R.Version()
@@ -527,7 +526,7 @@ pl <- planList()
 #PULL DATA
 Data <- pullStateData(2001)
 Data <- filterData(Data,2001)
-Data <- Data %>% filter(year < 2020)
+#Data <- Data %>% filter(year < 2020)
 
 PERSI.debt <- Data %>% filter(plan_name == "Idaho Public Employee Retirement System")
 PERSI.debt$year <- as.numeric(PERSI.debt$year)
@@ -540,7 +539,7 @@ sp500
 ```
 
 ### Asset Allocation (2001-2019) w/ R (custom)
-```{r assets, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r assets, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 plotTheme <- ggplot2::theme(   panel.grid.major = element_blank(),
                                panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
@@ -578,7 +577,7 @@ assets
 ```
 
 ### Change in Risk-Free Rate vs. Discount Rate (2001-2019) w/ R (linePlot())
-```{r treasury, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r treasury, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 ### linePlot ###
 ## Data: Database + Manual(AVA returns)
 ## Base: linePlot() function in `pensionviewr`
@@ -744,7 +743,7 @@ treasury
 ```
 
 ### Negative Amortization Growth w/ R (custom)
-```{r neg.amo, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+```{r neg.amo, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
 
 rm(list=ls())
 
@@ -842,6 +841,349 @@ neg.amo <- ggplot() +
 
 neg.amo
 #ggsave(filesave)
+```
+
+### Actual Change in Payroll vs. Assumption (2001-2020) w/ R (linePlot())
+```{r payroll, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+pl <- planList()
+
+#PULL DATA
+
+###################
+#Using 2 New Functions to download and filter datat from datatabase
+PERSI.data <- pullStateData(2001)
+PERSI.data <- filterData(PERSI.data, 2001)
+
+pl <- planList()
+#filter for PERSI
+PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
+
+PERSI.data$payroll <- as.numeric(PERSI.data$payroll)
+PERSI.data$payroll_growth_assumption <- as.numeric(PERSI.data$payroll_growth_assumption)
+payroll.growth <- PERSI.data$payroll_growth_assumption[1]
+PERSI.data <- PERSI.data %>% select(year, payroll, payroll_growth_assumption)
+PERSI.data <- data.table(PERSI.data) 
+
+PERSI.data$payroll_growth_assumption[1] <- PERSI.data$payroll[1]
+for(i in (2:length(PERSI.data$payroll_growth_assumption))){
+  PERSI.data$payroll_growth_assumption[i] <- PERSI.data$payroll_growth_assumption[i-1]*(1+payroll.growth)
+  
+}
+#View(DPF.data)
+# UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
+###############
+#Adding AVA returns (Arkansas ERS example*)
+
+PERSI.data <- data.frame(PERSI.data)
+#View(PERSI.data)
+
+linePlot <- function (data, title = NULL, caption = FALSE, grid = FALSE, 
+  treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = NULL, 
+  yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, yaxisScale = 100, 
+  format = NULL, str = 20, labelY = NULL, lab1 = NULL, lab2 = NULL, 
+  lab3 = NULL, lab4 = NULL, lab5 = NULL) 
+{
+  reasontheme::set_reason_theme(style = "slide")
+  x <- length(data$year)
+  data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+  if (isTRUE(treasury)) {
+    urlfile <- "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/treasury.csv"
+    treasury <- read_csv(url(urlfile), col_names = TRUE, 
+      na = c(""), skip_empty_rows = TRUE, col_types = NULL)
+    treasury$year <- as.numeric(treasury$year)
+    treasury <- treasury %>% filter(year>2000 & year < 2020)
+    data$year <- as.numeric(data$year)
+    treasury <- data.table(treasury %>% filter(year > min(data$year - 
+      1)))
+    data <- data %>% select(year, arr)
+    data <- data.table(data)
+    data <- cbind(data, treasury[, 2])
+    data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+    data <- as.data.table(data)
+    data$alt.discount <- NA
+    diff <- (data[year == min(data$year)]$arr - data[year == 
+      min(data$year)]$X30.treasury)
+    data$alt.discount <- data$X30.treasury + diff
+  }
+  geomean <- function(x) {
+    x <- as.vector(na.omit(x))
+    x <- x + 1
+    exp(mean(log(x))) - 1
+  }
+  if (isTRUE(inv.returns)) {
+    data$return_1yr <- as.numeric(data$return_1yr)
+    returns <- data$return_1yr
+    last <- length(returns)
+    rolling <- matrix(NA, last, 1)
+    rolling[last] <- as.numeric(geomean(returns[(last - 
+      9):last]))
+    for (i in 1:(last - 10)) {
+      rolling[last - i] <- geomean(returns[(last - 9 - 
+        i):(last - i)])
+    }
+    rolling <- data.table(rolling)
+    returns[(last - 9):last]
+    returns[(last - 9 + 1):(last - 1)]
+    data <- data.table(cbind(data, rolling))
+    data <- data %>% select(year, return_1yr, ava_return, 
+      arr, V1)
+  }
+  colnames(data) <- c("year", if (!is_null(lab1)) {
+    paste(lab1)
+  }, if (!is_null(lab2)) {
+    paste(lab2)
+  }, if (!is_null(lab3)) {
+    paste(lab3)
+  }, if (!is_null(lab4)) {
+    paste(lab4)
+  }, if (!is_null(lab5)) {
+    paste(lab5)
+  })
+  graph <- data.table(melt(data, id.vars = "year"))
+  lineColors <- c(palette_reason$Yellow, palette_reason$SatBlue, 
+    palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
+  options(repr.plot.width = 1, repr.plot.height = 0.75)
+  ggplot2::ggplot(graph, ggplot2::aes(x = year, y = yaxisScale * 
+    value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
+    str)), size = 1.5) + ggplot2::geom_hline(yintercept = 0, 
+    color = "black") + ggplot2::scale_colour_manual(values = lineColors) + 
+    ggplot2::scale_y_continuous(breaks = seq(yaxisMin, if (!is.null(yaxisMax)) {
+      yaxisMax
+    }
+    else {
+      max(graph$value) * yaxisScale * 1.2
+    }, by = yaxisSeq), limits = c(yaxisMin, if (!is.null(yaxisMax)) {
+      yaxisMax
+    } else {
+      max(graph$value) * yaxisScale * 1.2
+    }), labels = function(b) {
+      if (format == "%") {
+        paste0(round(b, 0), "%")
+      }
+      else if (format == "$") {
+        paste0("$", round(b, 0))
+      }
+      else {
+        paste0(format, round(b, 0))
+      }
+    }, expand = c(0, 0)) + ggplot2::scale_x_continuous(breaks = seq(min(graph$year), 
+    max(graph$year), by = 2), expand = c(0, 0)) + labs(x = element_blank(), 
+    y = labelY) + theme(legend.text = element_text(size = 13)) + 
+    theme(legend.direction = "vertical", legend.box = "horizontal", 
+      legend.position = if (isTRUE(treasury)) {
+        c(0.1, 1)
+      }
+      else {
+        c(0.33, 0.09)
+      }) + labs(title = paste(title), caption = ifelse(isTRUE(caption), 
+    paste("reason.org/pensions"), paste(""))) + ggplot2::theme(axis.ticks = if (isFALSE(ticks)) {
+    ggplot2::element_blank()
+  }
+  else {
+    ggplot2::element_line()
+  }) + ggplot2::theme(axis.ticks.x = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.ticks.y = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.text = element_text(size = 12), 
+    axis.title = element_text(size = 12, face = "bold")) + 
+    ggplot2::theme(text = element_text(family = if (!is_null(font)) {
+      paste(font)
+    }
+    else {
+      paste("Arial")
+    }, size = 9)) + ggplot2::theme(panel.grid.major.y = element_line(colour = ifelse(isTRUE(grid), 
+    paste(palette_reason$SpaceGrey), "white"), size = (1)))
+}
+
+
+payroll <- linePlot(PERSI.data, title = NULL, caption = FALSE, grid = FALSE, 
+                  treasury = FALSE, inv.returns = FALSE, ticks = TRUE, font = "Calibri",
+                  yaxisMin = 0, yaxisMax = 6000, yaxisSeq = 600,
+                  yaxisScale = 1/1000000, format = "$", str = 60,
+                  labelY = "Payroll in $Millions", lab1 = "Actual Payroll Growth",
+                  lab2 = "Projected Payroll Growth Based on 2001 Assumption")
+
+payroll
+```
+
+### Actual Inflation vs. Assumption  (2001-2020) w/ R (linePlot())
+```{r inflation, dpi=400, fig.width=8, fig.height=5, fig.align = "center", message=FALSE, warning=FALSE}
+pl <- planList()
+
+#PULL DATA
+
+###################
+#Using 2 New Functions to download and filter datat from datatabase
+PERSI.data <- pullStateData(2001)
+PERSI.data <- filterData(PERSI.data, 2001)
+
+pl <- planList()
+#filter for PERSI
+PERSI.data<- PERSI.data %>% filter (plan_name == "Idaho Public Employee Retirement System")
+#View(DPF.data)
+
+PERSI.data$inflation_assum <- as.numeric(PERSI.data$inflation_assum)
+PERSI.data <- PERSI.data %>% select(year, inflation_assum, payroll_growth_assumption)
+PERSI.data <- data.table(PERSI.data)
+
+PERSI.data$inflation_assum <- PERSI.data$payroll_growth_assumption
+
+PERSI.data$inflation_assum[18:20] <- c(0.025, 0.025, 0.023)
+
+PERSI.data$payroll_growth_assumption <-
+c(
+0.023325359,
+0.012857978,
+0.023081362,
+0.025380711,
+0.035753575,
+0.033988317,
+0.029075501,
+0.041525047,
+-0.004006115,
+0.016805793,
+0.034447189,
+0.021151049,
+0.015583985,
+0.01689742,
+-0.001756654,
+0.01105815,
+0.020472341,
+0.022240635,
+0.014533567,
+0.01832)
+#View(DPF.data)
+# UAL4 <- data.table(UAL4[, Tr30 := tr30[(n-UAL4[!is.na(Actual_Return),.N]):last]])
+###############
+#Adding AVA returns (Arkansas ERS example*)
+
+PERSI.data <- data.frame(PERSI.data)
+
+linePlot <- function (data, title = NULL, caption = FALSE, grid = FALSE, 
+  treasury = FALSE, inv.returns = TRUE, ticks = TRUE, font = NULL, 
+  yaxisMin = 0, yaxisMax = NULL, yaxisSeq = 5, yaxisScale = 100, 
+  format = NULL, str = 20, labelY = NULL, lab1 = NULL, lab2 = NULL, 
+  lab3 = NULL, lab4 = NULL, lab5 = NULL) 
+{
+  reasontheme::set_reason_theme(style = "slide")
+  x <- length(data$year)
+  data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+  if (isTRUE(treasury)) {
+    urlfile <- "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/files/treasury.csv"
+    treasury <- read_csv(url(urlfile), col_names = TRUE, 
+      na = c(""), skip_empty_rows = TRUE, col_types = NULL)
+    treasury$year <- as.numeric(treasury$year)
+    treasury <- treasury %>% filter(year>2000 & year < 2020)
+    data$year <- as.numeric(data$year)
+    treasury <- data.table(treasury %>% filter(year > min(data$year - 
+      1)))
+    data <- data %>% select(year, arr)
+    data <- data.table(data)
+    data <- cbind(data, treasury[, 2])
+    data <- data.frame(data) %>% dplyr::mutate_all(as.numeric)
+    data <- as.data.table(data)
+    data$alt.discount <- NA
+    diff <- (data[year == min(data$year)]$arr - data[year == 
+      min(data$year)]$X30.treasury)
+    data$alt.discount <- data$X30.treasury + diff
+  }
+  geomean <- function(x) {
+    x <- as.vector(na.omit(x))
+    x <- x + 1
+    exp(mean(log(x))) - 1
+  }
+  if (isTRUE(inv.returns)) {
+    data$return_1yr <- as.numeric(data$return_1yr)
+    returns <- data$return_1yr
+    last <- length(returns)
+    rolling <- matrix(NA, last, 1)
+    rolling[last] <- as.numeric(geomean(returns[(last - 
+      9):last]))
+    for (i in 1:(last - 10)) {
+      rolling[last - i] <- geomean(returns[(last - 9 - 
+        i):(last - i)])
+    }
+    rolling <- data.table(rolling)
+    returns[(last - 9):last]
+    returns[(last - 9 + 1):(last - 1)]
+    data <- data.table(cbind(data, rolling))
+    data <- data %>% select(year, return_1yr, ava_return, 
+      arr, V1)
+  }
+  colnames(data) <- c("year", if (!is_null(lab1)) {
+    paste(lab1)
+  }, if (!is_null(lab2)) {
+    paste(lab2)
+  }, if (!is_null(lab3)) {
+    paste(lab3)
+  }, if (!is_null(lab4)) {
+    paste(lab4)
+  }, if (!is_null(lab5)) {
+    paste(lab5)
+  })
+  graph <- data.table(melt(data, id.vars = "year"))
+  lineColors <- c(palette_reason$Yellow, palette_reason$SatBlue, 
+    palette_reason$SatBlue, palette_reason$LightGrey, palette_reason$LightGreen)
+  options(repr.plot.width = 1, repr.plot.height = 0.75)
+  ggplot2::ggplot(graph, ggplot2::aes(x = year, y = yaxisScale * 
+    value, group = variable)) + ggplot2::geom_line(ggplot2::aes(colour = str_wrap(factor(variable), 
+    str)), size = 1.5) + ggplot2::geom_hline(yintercept = 0, 
+    color = "black") + ggplot2::scale_colour_manual(values = lineColors) + 
+    ggplot2::scale_y_continuous(breaks = seq(yaxisMin, if (!is.null(yaxisMax)) {
+      yaxisMax
+    }
+    else {
+      max(graph$value) * yaxisScale * 1.2
+    }, by = yaxisSeq), limits = c(yaxisMin, if (!is.null(yaxisMax)) {
+      yaxisMax
+    } else {
+      max(graph$value) * yaxisScale * 1.2
+    }), labels = function(b) {
+      if (format == "%") {
+        paste0(round(b, 0), "%")
+      }
+      else if (format == "$") {
+        paste0("$", round(b, 0))
+      }
+      else {
+        paste0(format, round(b, 0))
+      }
+    }, expand = c(0, 0)) + ggplot2::scale_x_continuous(breaks = seq(min(graph$year), 
+    max(graph$year), by = 2), expand = c(0, 0)) + labs(x = element_blank(), 
+    y = labelY) + theme(legend.text = element_text(size = 13)) + 
+    theme(legend.direction = "vertical", legend.box = "horizontal", 
+      legend.position = if (isTRUE(treasury)) {
+        c(0.1, 1)
+      }
+      else {
+        c(0.2, 0.09)
+      }) + labs(title = paste(title), caption = ifelse(isTRUE(caption), 
+    paste("reason.org/pensions"), paste(""))) + ggplot2::theme(axis.ticks = if (isFALSE(ticks)) {
+    ggplot2::element_blank()
+  }
+  else {
+    ggplot2::element_line()
+  }) + ggplot2::theme(axis.ticks.x = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.ticks.y = element_line(size = 0.5, 
+    color = "black")) + ggplot2::theme(axis.text = element_text(size = 12), 
+    axis.title = element_text(size = 12, face = "bold")) + 
+    ggplot2::theme(text = element_text(family = if (!is_null(font)) {
+      paste(font)
+    }
+    else {
+      paste("Arial")
+    }, size = 9)) + ggplot2::theme(panel.grid.major.y = element_line(colour = ifelse(isTRUE(grid), 
+    paste(palette_reason$SpaceGrey), "white"), size = (1)))
+}
+
+
+inflation <- linePlot(PERSI.data, title = NULL, caption = FALSE, grid = FALSE, 
+                  treasury = FALSE, inv.returns = FALSE, ticks = TRUE, font = "Calibri",
+                  yaxisMin = -1, yaxisMax = 6, yaxisSeq = 1,
+                  yaxisScale = 100, format = "%", str = 60,
+                  labelY = "Inflation %", lab1 = "Assumed Inflation (by PERSI)",
+                  lab2 = "Actual inflation (CPI-U)")
+
+inflation
 ```
 
 ### References
